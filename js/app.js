@@ -46,40 +46,38 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear previous options
         answerOptions.innerHTML = '';
         
-        // Create Likert scale options
-        const likertOptions = document.createElement('div');
-        likertOptions.className = 'likert-scale';
-        
         // Define the Likert scale text labels
         const likertLabels = [
             "Strongly Disagree",
-            "Disagree",
+            "Disagree", 
             "Slightly Disagree",
             "Neutral",
-            "Slightly Agree",
+            "Slightly Agree", 
             "Agree",
             "Strongly Agree"
         ];
         
-        // Add options with text labels
-        for (let i = 1; i <= 7; i++) {
-            const option = document.createElement('div');
-            option.className = 'likert-option';
-            option.dataset.value = i;
-            option.textContent = likertLabels[i-1];
+        // Create container for options
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'likert-options-container';
+        
+        // Add each option as a button
+        likertLabels.forEach((label, index) => {
+            const button = document.createElement('button');
+            button.className = 'likert-button';
+            button.textContent = label;
+            button.dataset.value = index + 1; // Store 1-7 as the value
             
             // Add click event
-            option.addEventListener('click', function() {
-                // Remove selected class from all options
-                document.querySelectorAll('.likert-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                
-                // Add selected class to clicked option
-                this.classList.add('selected');
-                
+            button.addEventListener('click', function() {
                 // Record response
                 recordResponse(question, parseInt(this.dataset.value));
+                
+                // Highlight selected button
+                document.querySelectorAll('.likert-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                this.classList.add('selected');
                 
                 // Move to next question after a brief delay
                 setTimeout(() => {
@@ -87,11 +85,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 500);
             });
             
-            likertOptions.appendChild(option);
-        }
+            optionsContainer.appendChild(button);
+        });
         
         // Add to DOM
-        answerOptions.appendChild(likertOptions);
+        answerOptions.appendChild(optionsContainer);
         
         // Update progress
         updateProgress();
