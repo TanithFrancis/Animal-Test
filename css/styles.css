@@ -283,9 +283,13 @@ p {
 }
 
 .chart-container {
+    position: relative;
     width: 100%;
-    height: 300px;
+    max-width: 500px;
     margin: 0 auto;
+    height: auto;
+    aspect-ratio: 1/1;
+    padding: 20px;
 }
 
 .results-breakdown {
@@ -435,5 +439,10 @@ ul {
     
     .share-buttons {
         flex-direction: column;
+    }
+    
+    .chart-container {
+        max-width: 300px;
+        padding: 10px;
     }
 } 

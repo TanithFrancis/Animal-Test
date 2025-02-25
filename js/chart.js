@@ -24,11 +24,13 @@ function createRadarChart(scores) {
         }]
     };
     
-    // Chart configuration
+    // Chart configuration with added animations
     const config = {
         type: 'radar',
         data: data,
         options: {
+            responsive: true,
+            maintainAspectRatio: true,
             scales: {
                 r: {
                     angleLines: {
@@ -68,6 +70,14 @@ function createRadarChart(scores) {
             elements: {
                 line: {
                     tension: 0.2
+                }
+            },
+            // Animation configurations
+            animation: {
+                duration: 2000,
+                easing: 'easeOutQuart',
+                delay: (context) => {
+                    return context.dataIndex * 100;
                 }
             }
         }

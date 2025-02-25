@@ -4,9 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentQuestionIndex = 0;
     let userResponses = [];
     let chart = null;
-    
-    // Shuffle questions to randomize the order
-    const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+    let shuffledQuestions = []; // Define at the top level
     
     // Get DOM elements
     const startBtn = document.getElementById('start-btn');
@@ -27,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
         currentQuestionIndex = 0;
         userResponses = [];
         
+        // Shuffle ALL questions to randomize the order properly
+        shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+        
         // Show question screen
         showScreen('question-screen');
         
@@ -36,89 +37,129 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to load a question
     function loadQuestion() {
+        // Get the current question
         const question = shuffledQuestions[currentQuestionIndex];
         
         // Update question text
         questionText.textContent = question.text;
-        questionText.classList.remove('question-enter');
-        void questionText.offsetWidth; // Trigger reflow
-        questionText.classList.add('question-enter');
         
-        // Update progress
-        const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
-        progressFill.style.width = `${progress}%`;
-        questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
+        // Clear previous options
+        answerOptions.innerHTML = '';
         
-        // Set up answer options
-        const likertOptions = document.querySelectorAll('.likert-option');
-        likertOptions.forEach(option => {
-            option.classList.remove('selected');
+        // Create Likert scale options
+        const likertOptions = document.createElement('div');
+        likertOptions.className = 'likert-scale';
+        
+        // Add options (1-7 scale)
+        for (let i = 1; i <= 7; i++) {
+            const option = document.createElement('div');
+            option.className = 'likert-option';
+            option.dataset.value = i;
+            option.innerHTML = `<span>${i}</span>`;
+            
+            // Add click event
             option.addEventListener('click', function() {
                 // Remove selected class from all options
-                likertOptions.forEach(opt => opt.classList.remove('selected'));
+                document.querySelectorAll('.likert-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
                 
                 // Add selected class to clicked option
                 this.classList.add('selected');
                 
                 // Record response
-                const value = parseInt(this.getAttribute('data-value'));
-                recordResponse(question, value);
+                recordResponse(question, parseInt(this.dataset.value));
                 
-                // Move to next question after a short delay
+                // Move to next question after a brief delay
                 setTimeout(() => {
                     nextQuestion();
                 }, 500);
             });
-        });
+            
+            likertOptions.appendChild(option);
+        }
         
-        // Update background color based on the current metric
-        const metric = metrics.find(m => m.id === question.metric);
-        document.documentElement.style.setProperty('--primary-color', question.direction === metric.id[0] ? metric.colorPrimary : metric.colorSecondary);
+        // Add labels below the scale
+        const labels = document.createElement('div');
+        labels.className = 'likert-labels';
+        labels.innerHTML = `
+            <span>Strongly Disagree</span>
+            <span>Strongly Agree</span>
+        `;
+        
+        // Add to DOM
+        answerOptions.appendChild(likertOptions);
+        answerOptions.appendChild(labels);
+        
+        // Update progress
+        updateProgress();
+    }
+    
+    // Function to update progress indicators
+    function updateProgress() {
+        const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
+        progressFill.style.width = `${progress}%`;
+        questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
     }
     
     // Function to record a response
     function recordResponse(question, value) {
+        // Normalize value to 0-6 range (1-7 -> 0-6)
+        const normalizedValue = value - 1;
+        
+        // Calculate the actual score based on direction
+        // For "first letter" direction, higher values = higher score
+        // For "second letter" direction, higher values = lower score
+        let score;
+        if (question.direction === question.metric[0]) {
+            // First letter direction (E, N, T, J, A, P)
+            score = (normalizedValue / 6) * 100;
+        } else {
+            // Second letter direction (I, S, F, P, T, I)
+            score = ((6 - normalizedValue) / 6) * 100;
+        }
+        
+        // Store the response
         userResponses.push({
             question: question,
-            value: value
+            value: value,
+            score: score
         });
     }
     
     // Function to move to the next question
     function nextQuestion() {
+        // Increment the index
         currentQuestionIndex++;
         
+        // Check if there are more questions
         if (currentQuestionIndex < shuffledQuestions.length) {
+            // Load the next question
             loadQuestion();
         } else {
+            // Show loading screen before results
             showLoadingScreen();
         }
     }
     
-    // Function to show the loading screen
+    // Function to show loading screen
     function showLoadingScreen() {
+        // Show loading screen
         showScreen('loading-screen');
         
-        // Simulate loading time with changing messages
-        const loadingMessages = [
-            "Analyzing your personality traits...",
-            "Identifying your animal characteristics...",
-            "Matching you with your perfect animal type...",
-            "Almost there! Finalizing your results..."
-        ];
-        
-        let messageIndex = 0;
-        const messageInterval = setInterval(() => {
-            loadingMessage.textContent = loadingMessages[messageIndex];
-            messageIndex++;
+        // Simulate processing
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 5;
+            loadingMessage.textContent = `Analyzing your responses... ${progress}%`;
             
-            if (messageIndex >= loadingMessages.length) {
-                clearInterval(messageInterval);
+            if (progress >= 100) {
+                clearInterval(interval);
                 setTimeout(() => {
                     calculateResults();
-                }, 1500);
+                }, 500);
             }
-        }, 1500);
+        }, 100);
     }
     
     // Function to calculate results
@@ -126,40 +167,50 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize scores for each metric
         const scores = {};
         metrics.forEach(metric => {
-            scores[metric.id] = 50; // Start at neutral (50%)
+            scores[metric.id] = 50; // Start at neutral
         });
         
-        // Calculate scores based on responses
+        // Group responses by metric
+        const metricResponses = {};
+        metrics.forEach(metric => {
+            metricResponses[metric.id] = [];
+        });
+        
+        // Assign responses to metrics
         userResponses.forEach(response => {
-            const question = response.question;
-            const value = response.value;
-            const metric = question.metric;
-            const direction = question.direction;
-            
-            // Calculate the impact on the score
-            // Value is 1-5, we convert to -2 to +2 range
-            const impact = (value - 3) * 5; // -10 to +10 per question
-            
-            // If direction is the first letter of the metric, positive values increase the score
-            // If direction is the second letter, positive values decrease the score
-            if (direction === metric[0]) {
-                scores[metric] += impact;
-            } else {
-                scores[metric] -= impact;
-            }
+            metricResponses[response.question.metric].push(response);
         });
         
-        // Ensure scores are within 0-100 range
-        Object.keys(scores).forEach(metric => {
-            scores[metric] = Math.max(0, Math.min(100, scores[metric]));
+        // Calculate average score for each metric
+        metrics.forEach(metric => {
+            const responses = metricResponses[metric.id];
+            if (responses.length > 0) {
+                const sum = responses.reduce((total, response) => total + response.score, 0);
+                scores[metric.id] = Math.round(sum / responses.length);
+            }
         });
         
         // Display results
         displayResults(scores);
+        
+        // Update primary color based on dominant animal type
+        const animalCode = generateAnimalCode(scores);
+        const animalType = getAnimalType(animalCode);
+        const dominantMetric = Object.keys(scores).reduce((a, b) => {
+            return Math.abs(scores[a] - 50) > Math.abs(scores[b] - 50) ? a : b;
+        });
+        
+        const primaryColor = scores[dominantMetric] > 50 
+            ? metrics.find(m => m.id === dominantMetric).colorPrimary 
+            : metrics.find(m => m.id === dominantMetric).colorSecondary;
+        
+        document.documentElement.style.setProperty('--primary-color', primaryColor);
+        
+        // Show results screen with animation
         showScreen('results-screen');
         
-        // Reset primary color
-        document.documentElement.style.setProperty('--primary-color', '#4A90E2');
+        // Create and animate the radar chart
+        chart = createRadarChart(scores);
     }
     
     // Function to reset the assessment
