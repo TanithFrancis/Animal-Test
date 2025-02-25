@@ -46,6 +46,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear previous options
         answerOptions.innerHTML = '';
         
+        // Get the metric for this question
+        const metricId = question.metric;
+        const metric = metrics.find(m => m.id === metricId);
+        
+        // Get the appropriate color based on question direction
+        const buttonColor = question.direction === metricId[0] ? 
+                            metric.colorPrimary : 
+                            metric.colorSecondary;
+        
         // Define the Likert scale text labels
         const likertLabels = [
             "Strongly Disagree",
@@ -61,6 +70,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const optionsContainer = document.createElement('div');
         optionsContainer.className = 'likert-options-container';
         
+        // Set a data attribute for the metric on the container
+        optionsContainer.dataset.metric = metricId;
+        
         // Add each option as a button
         likertLabels.forEach((label, index) => {
             const button = document.createElement('button');
@@ -73,11 +85,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Record response
                 recordResponse(question, parseInt(this.dataset.value));
                 
-                // Highlight selected button
+                // Highlight selected button with the metric color
                 document.querySelectorAll('.likert-button').forEach(btn => {
                     btn.classList.remove('selected');
                 });
                 this.classList.add('selected');
+                this.style.backgroundColor = buttonColor;
                 
                 // Move to next question after a brief delay
                 setTimeout(() => {
@@ -91,8 +104,32 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add to DOM
         answerOptions.appendChild(optionsContainer);
         
+        // Update question header with metric color
+        const questionHeader = document.querySelector('.question-header');
+        if (questionHeader) {
+            questionHeader.style.borderColor = buttonColor;
+        }
+        
         // Update progress
         updateProgress();
+        
+        // Set CSS variable for the current metric color
+        document.documentElement.style.setProperty('--current-metric-color', buttonColor);
+        
+        // Helper function to convert hex to RGB
+        function hexToRgb(hex) {
+            // Remove the hash if it exists
+            hex = hex.replace('#', '');
+            
+            // Parse the hex values
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            return `${r}, ${g}, ${b}`;
+        }
+        
+        document.documentElement.style.setProperty('--current-metric-color-rgb', hexToRgb(buttonColor));
     }
     
     // Function to update progress indicators
