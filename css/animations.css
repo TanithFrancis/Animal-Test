@@ -1,0 +1,114 @@
+/* Fade In Animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.screen.active {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Question Transition */
+@keyframes slideInRight {
+    from { 
+        transform: translateX(50px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.question-enter {
+    animation: slideInRight 0.3s ease forwards;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.6; }
+}
+
+.animal-silhouette {
+    animation: pulse 2s infinite;
+}
+
+@keyframes morphing {
+    0% { border-radius: 50%; }
+    25% { border-radius: 60% 40% 40% 60% / 60% 30% 70% 40%; }
+    50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    75% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    100% { border-radius: 50%; }
+}
+
+.animal-silhouette {
+    animation: pulse 2s infinite, morphing 8s infinite;
+}
+
+/* Results Reveal Animation */
+@keyframes scaleIn {
+    from { 
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.animal-result {
+    animation: scaleIn 0.8s ease forwards;
+}
+
+/* Chart Animation */
+@keyframes drawChart {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.chart-container {
+    animation: drawChart 1s ease forwards;
+    animation-delay: 0.5s;
+    opacity: 0;
+}
+
+/* Dimension Bar Animation */
+@keyframes fillBar {
+    from { width: 0; }
+    to { width: var(--fill-width); }
+}
+
+.dimension-fill {
+    animation: fillBar 1s ease forwards;
+    animation-delay: 0.2s;
+    width: 0;
+}
+
+/* Button Hover Effects */
+.btn {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Likert Option Selection Animation */
+@keyframes selectOption {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.likert-option.selected {
+    animation: selectOption 0.3s ease;
+} 

@@ -3,314 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Which Animal Are You? Quiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Roboto&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-image: url('images/background.jpg');
-            background-size: cover;
-            background-attachment: fixed;
-            color: #333;
-            text-align: center;
-            padding: 20px;
-            margin: 0;
-            transition: all 0.5s ease;
-        }
-        .overlay {
-            background-color: rgba(255, 255, 255, 0.85);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 700px;
-            margin: 20px auto;
-            position: relative;
-        }
-        h1, h2 {
-            font-family: 'Playfair Display', serif;
-            color: #2c6e49;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.1em;
-            line-height: 1.6;
-        }
-        button {
-            background-color: #4a7c59;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s, background-color 0.3s;
-            margin: 10px;
-        }
-        button:hover {
-            background-color: #386641;
-            transform: scale(1.05);
-        }
-        button:active {
-            transform: scale(0.95);
-        }
-        input[type="radio"] {
-            display: none;
-        }
-        label {
-            display: block;
-            margin: 15px 0;
-            padding: 12px;
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 1.1em;
-        }
-        label:hover {
-            background-color: #d4e6d4;
-        }
-        input[type="radio"]:checked + label {
-            background-color: #a3c4a3;
-        }
-        .progress {
-            width: 100%;
-            background-color: #e0e0e0;
-            height: 6px;
-            margin-bottom: 30px;
-            border-radius: 3px;
-        }
-        .progress-bar {
-            height: 100%;
-            background-color: #4a7c59;
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 3px;
-        }
-        .fade-in {
-            animation: fadeIn 0.6s ease-in;
-        }
-        .slide-in {
-            animation: slideIn 0.6s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-        .separator {
-            width: 80%;
-            height: 2px;
-            background-color: #ccc;
-            margin: 20px auto;
-            border-radius: 1px;
-        }
-        #result img {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 5px solid #4a7c59;
-            margin: 20px 0;
-            object-fit: cover;
-        }
-        #share-button {
-            background-color: #2c6e49;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #share-button:hover {
-            background-color: #1e5631;
-        }
-        /* Japanese-inspired wave pattern */
-        .wave {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#4a7c59" fill-opacity="0.1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,213.3C672,224,768,224,864,213.3C960,203,1056,181,1152,181.3C1248,181,1344,203,1392,213.3L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
-            background-size: cover;
-            z-index: -1;
-        }
-    </style>
+    <title>Animal Personality Assessment</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div id="intro" class="overlay fade-in">
-        <h1>Which Animal Are You?</h1>
-        <p>Embark on a journey of self-discovery and find out which animal reflects your unique personality.</p>
-        <button id="start">Begin Your Journey</button>
-        <div class="wave"></div>
-    </div>
-    <div id="quiz" class="overlay" style="display: none;">
-        <div class="progress"><div class="progress-bar"></div></div>
-        <h2 id="question-number">Question 1 of 20</h2>
-        <p id="question-text"></p>
-        <div id="options">
-            <input type="radio" name="answer" id="SA" value="SA"><label for="SA">Strongly Agree</label>
-            <input type="radio" name="answer" id="A" value="A"><label for="A"> Agree</label>
-            <input type="radio" name="answer" id="N" value="N"><label for="N">Neutral</label>
-            <input type="radio" name="answer" id="D" value="D"><label for="D">Disagree</label>
-            <input type="radio" name="answer" id="SD" value="SD"><label for="SD">Strongly Disagree</label>
+    <div class="container">
+        <div id="intro-screen" class="screen active">
+            <h1>Animal Personality Assessment</h1>
+            <p>Discover your animal personality type with our scientifically-based assessment.</p>
+            <p>This test measures 6 key personality dimensions to match you with 1 of 64 unique animal types.</p>
+            <div class="metrics-preview">
+                <div class="metric">
+                    <span class="metric-label">E</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" style="background-color: #FF9933;"></div>
+                    </div>
+                    <span class="metric-label">I</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">N</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" style="background-color: #9966CC;"></div>
+                    </div>
+                    <span class="metric-label">S</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">T</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" style="background-color: #CC3333;"></div>
+                    </div>
+                    <span class="metric-label">F</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">J</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" style="background-color: #003366;"></div>
+                    </div>
+                    <span class="metric-label">P</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">A</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" style="background-color: #D4AF37;"></div>
+                    </div>
+                    <span class="metric-label">T</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">P</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" style="background-color: #8B4513;"></div>
+                    </div>
+                    <span class="metric-label">I</span>
+                </div>
+            </div>
+            <button id="start-btn" class="btn primary-btn">Start Assessment</button>
         </div>
-        <div class="separator"></div>
-        <button id="prev">Previous</button>
-        <button id="next">Next</button>
-        <div class="wave"></div>
+
+        <div id="question-screen" class="screen">
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div id="question-counter">Question 1 of 60</div>
+            </div>
+            <div id="question-container">
+                <h2 id="question-text">Question text will appear here</h2>
+                <div id="answer-options" class="answer-options">
+                    <div class="likert-scale">
+                        <button class="likert-option" data-value="1">Strongly Disagree</button>
+                        <button class="likert-option" data-value="2">Disagree</button>
+                        <button class="likert-option" data-value="3">Neutral</button>
+                        <button class="likert-option" data-value="4">Agree</button>
+                        <button class="likert-option" data-value="5">Strongly Agree</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading-screen" class="screen">
+            <h2>Analyzing your responses...</h2>
+            <div class="animal-silhouette-container">
+                <div class="animal-silhouette"></div>
+            </div>
+            <p id="loading-message">Discovering your animal personality...</p>
+        </div>
+
+        <div id="results-screen" class="screen">
+            <h1>Your Animal Personality Type</h1>
+            <div class="results-container">
+                <div class="animal-result">
+                    <img id="animal-image" src="" alt="Your animal type">
+                    <h2 id="animal-name">Animal Name</h2>
+                    <div id="animal-code" class="animal-code">XXXXXX</div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="results-chart"></canvas>
+                </div>
+                
+                <div class="results-breakdown">
+                    <h3>Your Personality Dimensions</h3>
+                    <div id="dimensions-breakdown"></div>
+                </div>
+                
+                <div class="animal-description">
+                    <h3>About Your Type</h3>
+                    <p id="animal-description"></p>
+                    
+                    <div class="traits-container">
+                        <div class="strengths">
+                            <h4>Strengths</h4>
+                            <ul id="strengths-list"></ul>
+                        </div>
+                        <div class="challenges">
+                            <h4>Challenges</h4>
+                            <ul id="challenges-list"></ul>
+                        </div>
+                    </div>
+                    
+                    <div class="compatibility">
+                        <h4>Compatible With</h4>
+                        <div id="compatible-types"></div>
+                    </div>
+                    
+                    <div class="growth">
+                        <h4>Growth Areas</h4>
+                        <p id="growth-areas"></p>
+                    </div>
+                </div>
+                
+                <div class="share-container">
+                    <h3>Share Your Results</h3>
+                    <div class="share-buttons">
+                        <button id="whatsapp-share" class="btn share-btn whatsapp">
+                            Share to WhatsApp
+                        </button>
+                        <button id="download-results" class="btn share-btn download">
+                            Download Results
+                        </button>
+                    </div>
+                    <div class="qr-container">
+                        <p>Let others take the test:</p>
+                        <div id="qr-code"></div>
+                    </div>
+                </div>
+                
+                <button id="retake-btn" class="btn secondary-btn">Retake Assessment</button>
+            </div>
+        </div>
     </div>
-    <div id="result" class="overlay" style="display: none;">
-        <h2>Your Result</h2>
-        <img id="animal-image" src="" alt="Your Animal">
-        <p id="animal-code" style="font-family: 'Playfair Display', serif; font-size: 1.2em;"></p>
-        <p id="animal-name" style="font-family: 'Playfair Display', serif; font-size: 1.5em; color: #2c6e49;"></p>
-        <p id="animal-description"></p>
-        <button id="share-button">Share Your Result</button>
-        <div class="wave"></div>
-    </div>
-    <script>
-        const questions = [
-            { text: "I enjoy attending social events and meeting new people.", dichotomy: 0, favors: 'S' },
-            { text: "I prefer to spend my free time alone.", dichotomy: 0, favors: 'O' },
-            { text: "I find it easy to start conversations with strangers.", dichotomy: 0, favors: 'S' },
-            { text: "I need time alone to recharge after socializing.", dichotomy: 0, favors: 'O' },
-            { text: "I feel more productive when working in a team.", dichotomy: 0, favors: 'S' },
-            { text: "I take initiative to solve problems before they escalate.", dichotomy: 1, favors: 'P' },
-            { text: "I prefer to wait and see how things develop before acting.", dichotomy: 1, favors: 'R' },
-            { text: "I enjoy taking risks to achieve my goals.", dichotomy: 1, favors: 'P' },
-            { text: "I tend to plan ahead rather than react in the moment.", dichotomy: 1, favors: 'P' },
-            { text: "I am more likely to confront issues directly.", dichotomy: 1, favors: 'P' },
-            { text: "I am most alert and productive in the morning.", dichotomy: 2, favors: 'D' },
-            { text: "I prefer to stay up late at night.", dichotomy: 2, favors: 'N' },
-            { text: "I find it easier to focus during the day.", dichotomy: 2, favors: 'D' },
-            { text: "I tend to feel more creative or inspired in the evening.", dichotomy: 2, favors: 'N' },
-            { text: "My energy levels peak in the afternoon.", dichotomy: 2, favors: 'D' },
-            { text: "I like to have a set schedule and stick to it.", dichotomy: 3, favors: 'T' },
-            { text: "I enjoy trying new things and exploring unfamiliar places.", dichotomy: 3, favors: 'A' },
-            { text: "I prefer to plan my activities in advance.", dichotomy: 3, favors: 'T' },
-            { text: "I am comfortable with last-minute changes.", dichotomy: 3, favors: 'A' },
-            { text: "I find comfort in familiarity and routine.", dichotomy: 3, favors: 'T' }
-        ];
 
-        const dichotomies = [
-            { traits: ['S', 'O'] }, // Social vs. Solitary
-            { traits: ['P', 'R'] }, // Proactive vs. Reactive
-            { traits: ['D', 'N'] }, // Day vs. Night
-            { traits: ['T', 'A'] }  // Traditional vs. Adventurous
-        ];
-
-        const animals = {
-            'S-P-D-T': { name: 'Wolf', description: 'You are a natural leader who thrives in social settings.' },
-            'S-P-D-A': { name: 'Lion', description: 'You are bold and social, often taking charge in groups.' },
-            'S-P-N-T': { name: 'Hyena', description: 'You are resourceful and thrive in groups at night.' },
-            'S-P-N-A': { name: 'Bat', description: 'You are social and adventurous, coming alive at night.' },
-            'S-R-D-T': { name: 'Elephant', description: 'You are a gentle giant, social and reliable.' },
-            'S-R-D-A': { name: 'Penguin', description: 'You are social and adaptable, comfortable in groups.' },
-            'S-R-N-T': { name: 'Rat', description: 'You are clever and social, active at night.' },
-            'S-R-N-A': { name: 'Dolphin', description: 'You are playful and social, adapting easily.' },
-            'O-P-D-T': { name: 'Tiger', description: 'You are independent and powerful, active during the day.' },
-            'O-P-D-A': { name: 'Eagle', description: 'You are a visionary who soars alone during the day.' },
-            'O-P-N-T': { name: 'Owl', description: 'You are wise and independent, thriving at night.' },
-            'O-P-N-A': { name: 'Panther', description: 'You are stealthy and independent, active at night.' },
-            'O-R-D-T': { name: 'Sloth', description: 'You are relaxed and solitary, moving at your own pace.' },
-            'O-R-D-A': { name: 'Tortoise', description: 'You are steady and independent, taking life slowly.' },
-            'O-R-N-T': { name: 'Koala', description: 'You are calm and solitary, often active at night.' },
-            'O-R-N-A': { name: 'Cat', description: 'You are independent and mysterious, thriving at night.' }
-        };
-
-        let currentQuestion = 0;
-        let answers = Array(20).fill(null);
-
-        const intro = document.getElementById('intro');
-        const quiz = document.getElementById('quiz');
-        const result = document.getElementById('result');
-        const startButton = document.getElementById('start');
-        const prevButton = document.getElementById('prev');
-        const nextButton = document.getElementById('next');
-        const questionNumber = document.getElementById('question-number');
-        const questionText = document.getElementById('question-text');
-        const progressBar = document.querySelector('.progress-bar');
-        const animalImage = document.getElementById('animal-image');
-        const animalCode = document.getElementById('animal-code');
-        const animalName = document.getElementById('animal-name');
-        const animalDescription = document.getElementById('animal-description');
-        const shareButton = document.getElementById('share-button');
-
-        startButton.addEventListener('click', () => {
-            intro.classList.remove('fade-in');
-            intro.style.display = 'none';
-            quiz.style.display = 'block';
-            quiz.classList.add('fade-in');
-            displayQuestion();
-        });
-
-        prevButton.addEventListener('click', () => {
-            if (currentQuestion > 0) {
-                saveAnswer();
-                currentQuestion--;
-                displayQuestion();
-            }
-        });
-
-        nextButton.addEventListener('click', () => {
-            saveAnswer();
-            if (currentQuestion < 19) {
-                currentQuestion++;
-                displayQuestion();
-            } else {
-                calculateResult();
-            }
-        });
-
-        shareButton.addEventListener('click', () => {
-            const shareText = `I am a ${animalName.textContent.split(' ').pop()}! Find out your animal personality: [link]`;
-            navigator.clipboard.writeText(shareText);
-            alert('Share text copied to clipboard!');
-        });
-
-        function displayQuestion() {
-            questionNumber.textContent = `Question ${currentQuestion + 1} of 20`;
-            questionText.textContent = questions[currentQuestion].text;
-            progressBar.style.width = `${(currentQuestion + 1) / 20 * 100}%`;
-            const radios = document.querySelectorAll('input[name="answer"]');
-            radios.forEach(radio => {
-                radio.checked = (radio.value === answers[currentQuestion]);
-            });
-            nextButton.textContent = currentQuestion === 19 ? 'Submit' : 'Next';
-            quiz.classList.remove('slide-in');
-            void quiz.offsetWidth; // Trigger reflow
-            quiz.classList.add('slide-in');
-        }
-
-        function saveAnswer() {
-            const selected = document.querySelector('input[name="answer"]:checked');
-            if (selected) answers[currentQuestion] = selected.value;
-        }
-
-        function calculateResult() {
-            const points = { 'SA': 2, 'A': 1, 'N': 0, 'D': -1, 'SD': -2 };
-            const scores = [0, 0, 0, 0];
-            questions.forEach((question, index) => {
-                const answer = answers[index];
-                if (answer) {
-                    const dichotomy = question.dichotomy;
-                    const favor = question.favors;
-                    const traitIndex = dichotomies[dichotomy].traits.indexOf(favor);
-                    const score = points[answer];
-                    scores[dichotomy] += (traitIndex === 0) ? score : -score;
-                }
-            });
-            const code = scores.map((score, i) => score > 0 ? dichotomies[i].traits[0] : dichotomies[i].traits[1]).join('-');
-            const animal = animals[code];
-            quiz.style.display = 'none';
-            result.style.display = 'block';
-            result.classList.add('fade-in');
-            animalImage.src = `images/${animal.name.toLowerCase()}.jpg`;
-            animalCode.textContent = `Your code: ${code}`;
-            animalName.textContent = `You are a ${animal.name}`;
-            animalDescription.textContent = animal.description;
-        }
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="js/questions.js"></script>
+    <script src="js/animals.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/results.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
