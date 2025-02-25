@@ -50,12 +50,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const likertOptions = document.createElement('div');
         likertOptions.className = 'likert-scale';
         
-        // Add options (1-7 scale)
+        // Define the Likert scale text labels
+        const likertLabels = [
+            "Strongly Disagree",
+            "Disagree",
+            "Slightly Disagree",
+            "Neutral",
+            "Slightly Agree",
+            "Agree",
+            "Strongly Agree"
+        ];
+        
+        // Add options with text labels
         for (let i = 1; i <= 7; i++) {
             const option = document.createElement('div');
             option.className = 'likert-option';
             option.dataset.value = i;
-            option.innerHTML = `<span>${i}</span>`;
+            option.textContent = likertLabels[i-1];
             
             // Add click event
             option.addEventListener('click', function() {
@@ -79,17 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
             likertOptions.appendChild(option);
         }
         
-        // Add labels below the scale
-        const labels = document.createElement('div');
-        labels.className = 'likert-labels';
-        labels.innerHTML = `
-            <span>Strongly Disagree</span>
-            <span>Strongly Agree</span>
-        `;
-        
         // Add to DOM
         answerOptions.appendChild(likertOptions);
-        answerOptions.appendChild(labels);
         
         // Update progress
         updateProgress();
