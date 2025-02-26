@@ -118,14 +118,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Helper function to convert hex to RGB
         function hexToRgb(hex) {
-            // Remove the hash if it exists
             hex = hex.replace('#', '');
-            
-            // Parse the hex values
             const r = parseInt(hex.substring(0, 2), 16);
             const g = parseInt(hex.substring(2, 4), 16);
             const b = parseInt(hex.substring(4, 6), 16);
-            
             return `${r}, ${g}, ${b}`;
         }
         
@@ -141,22 +137,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to record a response
     function recordResponse(question, value) {
-        // Normalize value to 0-6 range (1-7 -> 0-6)
+        // Normalize value to 0-6 (scale 1-7 -> 0-6)
         const normalizedValue = value - 1;
-        
-        // Calculate the actual score based on direction
-        // For "first letter" direction, higher values = higher score
-        // For "second letter" direction, higher values = lower score
         let score;
+        // Check: if question.direction equals the first letter of the metric, use one formula; otherwise, reverse it.
         if (question.direction === question.metric[0]) {
-            // First letter direction (E, N, T, J, A, P)
             score = (normalizedValue / 6) * 100;
         } else {
-            // Second letter direction (I, S, F, P, T, I)
             score = ((6 - normalizedValue) / 6) * 100;
         }
         
-        // Store the response
         userResponses.push({
             question: question,
             value: value,
@@ -201,24 +191,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to calculate results
     function calculateResults() {
-        // Initialize scores for each metric
         const scores = {};
+        
+        // Initialize each metric's score.
         metrics.forEach(metric => {
-            scores[metric.id] = 50; // Start at neutral
+            scores[metric.id] = 50; // start from neutral
         });
         
-        // Group responses by metric
+        // Group responses by metric.
         const metricResponses = {};
         metrics.forEach(metric => {
             metricResponses[metric.id] = [];
         });
         
-        // Assign responses to metrics
+        // Distribute responses into each metric.
         userResponses.forEach(response => {
-            metricResponses[response.question.metric].push(response);
+            if (metricResponses[response.question.metric]) {
+                metricResponses[response.question.metric].push(response);
+            }
         });
         
-        // Calculate average score for each metric
+        // For each metric, calculate the average score.
         metrics.forEach(metric => {
             const responses = metricResponses[metric.id];
             if (responses.length > 0) {
@@ -227,12 +220,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // Now generate the 6-letter code (the method below assumes you iterate in metric order)
+        const typeCode = generateAnimalCode(scores);
+        
         // Display results
         displayResults(scores);
         
         // Update primary color based on dominant animal type
-        const animalCode = generateAnimalCode(scores);
-        const animalType = getAnimalType(animalCode);
+        const animalType = getAnimalType(typeCode);
         const dominantMetric = Object.keys(scores).reduce((a, b) => {
             return Math.abs(scores[a] - 50) > Math.abs(scores[b] - 50) ? a : b;
         });
@@ -271,5 +266,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show the specified screen
         document.getElementById(screenId).classList.add('active');
+    }
+    
+    // Function to generate the type code from scores.
+    function generateAnimalCode(scores) {
+        let code = "";
+        metrics.forEach(metric => {
+            const score = scores[metric.id];
+            // If score > 50, choose the first letter; otherwise choose the second.
+            code += (score > 50 ? metric.id[0] : metric.id[1]);
+        });
+        return code;
     }
 }); 
