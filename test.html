@@ -52,24 +52,17 @@
     </div>
   </header>
 
-  <!-- Main Test Content -->
+  <!-- Test Content: Immediately shows the Question Screen -->
   <main class="container mx-auto px-4 py-12">
-    <!-- Start Test Section (no extra intro-screen container) -->
-    <div class="flex flex-col items-center justify-center">
-      <button id="start-btn" class="px-8 py-4 bg-primary text-white font-semibold rounded shadow transition-all hover:bg-secondary">
-        Start Test
-      </button>
-    </div>
-    <!-- Test screen (hidden by default; app.js will toggle display) -->
-    <div id="test-screen" class="mt-8 hidden">
-      <!-- Question Screen -->
+    <div id="test-screen" class="mt-8">
+      <!-- Question Screen (visible right away) -->
       <div id="question-screen">
-        <div class="question-header border-b-4 border-blue-500 mb-6">
+        <div class="question-header border-b-4 border-primary mb-6">
           <h2 id="question-text" class="text-2xl font-semibold mb-4"></h2>
         </div>
         <div id="answer-options"></div>
       </div>
-      <!-- Results Screen -->
+      <!-- Results Screen (hidden by default) -->
       <div id="results-screen" class="hidden">
         <div class="bg-white rounded-lg shadow p-8">
           <h2 class="text-3xl font-bold text-primary mb-4">Your Results</h2>
@@ -92,7 +85,15 @@
     </div>
   </footer>
 
-  <!-- Main App JS (which handles starting the test, loading questions, etc.) -->
+  <!-- Main App JS (handles test logic: loading questions, recording answers, calculating results, etc.) -->
   <script src="js/app.js"></script>
+  <script>
+    // Automatically start the test once the page loads, so no start button is needed.
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof startAssessment === 'function') {
+        startAssessment();
+      }
+    });
+  </script>
 </body>
 </html> 
