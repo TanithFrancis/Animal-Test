@@ -1,11 +1,5 @@
-// Assumes that questions.js defines a global variable `questions` containing your 60 question objects.
+// Do not redefine "metrics" here – use the global variable defined in questions.js
 
-// Dummy metrics array for calculation
-const metrics = [
-    { id: "EX", colorPrimary: "#66CC99", colorSecondary: "#8FBC8F" }
-];
-
-// Main application logic
 document.addEventListener('DOMContentLoaded', function() {
     let currentQuestionIndex = 0;
     let userResponses = [];
@@ -21,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const questionCounter = document.getElementById('question-counter'); // Optional: For counter display
     const loadingMessage = document.getElementById('loading-message'); // Optional: For loading screen
 
-    // Attach event listeners: start immediately if no button on the page
+    // Attach event listeners: if a start button exists, use it; otherwise, start immediately.
     if (startBtn) {
         startBtn.addEventListener('click', startAssessment);
     } else {
@@ -52,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const question = shuffledQuestions[currentQuestionIndex];
-        // Display the current question number followed by the actual question statement from questions.js
+        // Display the sequential question number and the actual question statement from questions.js
         questionText.innerHTML = `<span class="block text-xl font-bold mb-2">
           Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}:
         </span> ${question.text}`;
@@ -156,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calculate results and display them
     function calculateResults() {
         const scores = {};
+        // Use the global metrics from questions.js
         metrics.forEach(metric => {
             scores[metric.id] = 50;
         });
@@ -184,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const dominantMetric = Object.keys(scores).reduce((a, b) =>
             Math.abs(scores[a] - 50) > Math.abs(scores[b] - 50) ? a : b
         );
+        // Use primary and secondary colors from the global metrics array
         const primaryColor = scores[dominantMetric] > 50 
             ? metrics.find(m => m.id === dominantMetric).colorPrimary 
             : metrics.find(m => m.id === dominantMetric).colorSecondary;

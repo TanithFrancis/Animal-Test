@@ -67,6 +67,9 @@
           </div>
         </div>
       </div>
+      <div id="loading-screen" class="hidden">
+        <div id="loading-message" class="text-center text-xl font-bold">Loading...</div>
+      </div>
     </div>
   </main>
 
@@ -87,7 +90,6 @@
   <!-- Then include the app logic -->
   <script src="js/app.js"></script>
   <script>
-    // Automatically start the test once the page loads.
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof startAssessment === 'function') {
         startAssessment();
