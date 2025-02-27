@@ -4,46 +4,58 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentQuestionIndex = 0;
     let userResponses = [];
     let chart = null;
-    let shuffledQuestions = []; // Define at the top level
-    
-    // Get DOM elements
-    const startBtn = document.getElementById('start-btn');
+    let shuffledQuestions = []; // Randomized questions array
+
+    // Get DOM elements (if they exist)
+    const startBtn = document.getElementById('start-btn'); // May not exist on test.html
     const retakeBtn = document.getElementById('retake-btn');
     const questionText = document.getElementById('question-text');
     const answerOptions = document.getElementById('answer-options');
-    const progressFill = document.getElementById('progress-fill');
-    const questionCounter = document.getElementById('question-counter');
-    const loadingMessage = document.getElementById('loading-message');
-    
-    // Event listeners
-    startBtn.addEventListener('click', startAssessment);
-    retakeBtn.addEventListener('click', resetAssessment);
-    
+    const progressFill = document.getElementById('progress-fill'); // Optional: if you have a progress bar
+    const questionCounter = document.getElementById('question-counter'); // Optional: if you show a question counter
+    const loadingMessage = document.getElementById('loading-message'); // Optional: for loading screen
+
+    // Attach event listeners:
+    // On test.html, there is no start button – test starts automatically.
+    if (startBtn) {
+        startBtn.addEventListener('click', startAssessment);
+    } else {
+        startAssessment();
+    }
+    retakeBtn.addEventListener('click', function() {
+        if (chart) {
+            chart.destroy();
+            chart = null;
+        }
+        startAssessment();
+    });
+
     // Function to start the assessment
     function startAssessment() {
-        // Reset variables
         currentQuestionIndex = 0;
         userResponses = [];
-        
-        // Shuffle ALL questions to randomize the order properly
+        // Shuffle ALL questions (assuming a global 'questions' array exists)
         shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
-        
-        // Show question screen
         showScreen('question-screen');
-        
-        // Load first question
         loadQuestion();
     }
-    
-    // Function to load a question (ensuring the blue color is always used)
+
+    // Function to load a question and display it
     function loadQuestion() {
+        // If the test is completed, proceed to results.
+        if (currentQuestionIndex >= shuffledQuestions.length) {
+            showLoadingScreen();
+            return;
+        }
+        
         const question = shuffledQuestions[currentQuestionIndex];
         questionText.textContent = question.text;
-        answerOptions.innerHTML = "";
+        answerOptions.innerHTML = ""; // Clear previous answer options
 
-        // Fixed blue color (primary) from our Tailwind config
-        const buttonColorClass = "bg-blue-500 text-white",
-              buttonDefaultClass = "bg-gray-100 text-gray-800";
+        // Use your green theme for selections:
+        // Selected answer style uses primary which is defined in Tailwind config as "#66CC99".
+        const buttonColorClass = "bg-primary text-white";
+        const buttonDefaultClass = "bg-gray-100 text-gray-800";
 
         const likertLabels = [
             "Strongly Disagree",
@@ -60,99 +72,75 @@ document.addEventListener('DOMContentLoaded', function() {
 
         likertLabels.forEach((label, index) => {
             const button = document.createElement("button");
-            button.className = `likert-button px-4 py-3 rounded transition-colors ${buttonDefaultClass}`;
+            button.className = `px-4 py-3 rounded transition-colors ${buttonDefaultClass}`;
             button.textContent = label;
-            button.dataset.value = index + 1;
+            button.dataset.value = index + 1; // Scale is 1 to 7
 
             button.addEventListener("click", function () {
                 recordResponse(question, parseInt(this.dataset.value));
-
-                // Remove dynamic (non-blue) selections from all buttons.
-                document
-                    .querySelectorAll(".likert-button")
-                    .forEach((btn) => {
-                        btn.classList.remove("bg-blue-500", "text-white");
-                        btn.classList.add("bg-gray-100", "text-gray-800");
-                    });
-
-                // Mark the clicked button as selected.
+                // Remove selection styles from all buttons in the container
+                optionsContainer.querySelectorAll("button").forEach((btn) => {
+                    btn.classList.remove("bg-primary", "text-white");
+                    btn.classList.add("bg-gray-100", "text-gray-800");
+                });
+                // Mark the clicked button as selected with the green theme
                 this.classList.remove("bg-gray-100", "text-gray-800");
-                this.classList.add("bg-blue-500", "text-white");
+                this.classList.add("bg-primary", "text-white");
 
-                // Brief delay before advancing.
+                // Brief delay before advancing
                 setTimeout(() => {
-                    nextQuestion();
+                    currentQuestionIndex++;
+                    loadQuestion();
                 }, 500);
             });
-
             optionsContainer.appendChild(button);
         });
 
         answerOptions.appendChild(optionsContainer);
-
-        // Update progress if applicable.
         updateProgress();
 
-        // Ensure any question header styling remains blue (using Tailwind).
+        // Update question header border to use primary (green)
         const questionHeader = document.querySelector(".question-header");
         if (questionHeader) {
             questionHeader.classList.remove("border-secondary");
-            questionHeader.classList.add("border-blue-500");
+            questionHeader.classList.add("border-primary");
         }
     }
-    
-    // Function to update progress indicators
+
+    // Function to update progress (if you have a progress bar or counter)
     function updateProgress() {
-        const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
-        progressFill.style.width = `${progress}%`;
-        questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
+        if(progressFill && questionCounter && shuffledQuestions.length > 0){
+            const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
+            progressFill.style.width = `${progress}%`;
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
+        }
     }
-    
-    // Function to record a response
+
+    // Record user response for each question
     function recordResponse(question, value) {
-        // Normalize value to 0-6 (scale 1-7 -> 0-6)
-        const normalizedValue = value - 1;
+        const normalizedValue = value - 1; // Convert scale of 1-7 to 0-6
         let score;
-        // Check: if question.direction equals the first letter of the metric, use one formula; otherwise, reverse it.
         if (question.direction === question.metric[0]) {
             score = (normalizedValue / 6) * 100;
         } else {
             score = ((6 - normalizedValue) / 6) * 100;
         }
-        
         userResponses.push({
             question: question,
             value: value,
             score: score
         });
     }
-    
-    // Function to move to the next question
-    function nextQuestion() {
-        // Increment the index
-        currentQuestionIndex++;
-        
-        // Check if there are more questions
-        if (currentQuestionIndex < shuffledQuestions.length) {
-            // Load the next question
-            loadQuestion();
-        } else {
-            // Show loading screen before results
-            showLoadingScreen();
-        }
-    }
-    
-    // Function to show loading screen
+
+    // Function to show a loading screen then calculate results
     function showLoadingScreen() {
-        // Show loading screen
         showScreen('loading-screen');
-        
-        // Simulate processing
         let progress = 0;
         const interval = setInterval(() => {
             progress += 5;
-            loadingMessage.textContent = `Analyzing your responses... ${progress}%`;
-            
+            if(loadingMessage){
+                loadingMessage.textContent = `Analyzing your responses... ${progress}%`;
+            }
             if (progress >= 100) {
                 clearInterval(interval);
                 setTimeout(() => {
@@ -161,30 +149,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 100);
     }
-    
-    // Function to calculate results
+
+    // Function to calculate results and display them
     function calculateResults() {
         const scores = {};
         
-        // Initialize each metric's score.
+        // Initialize metrics at a neutral score; assume 'metrics' is a global array.
         metrics.forEach(metric => {
-            scores[metric.id] = 50; // start from neutral
+            scores[metric.id] = 50;
         });
-        
-        // Group responses by metric.
+
+        // Group responses by metric
         const metricResponses = {};
         metrics.forEach(metric => {
             metricResponses[metric.id] = [];
         });
-        
-        // Distribute responses into each metric.
         userResponses.forEach(response => {
             if (metricResponses[response.question.metric]) {
                 metricResponses[response.question.metric].push(response);
             }
         });
-        
-        // For each metric, calculate the average score.
+
+        // Calculate averages
         metrics.forEach(metric => {
             const responses = metricResponses[metric.id];
             if (responses.length > 0) {
@@ -192,67 +178,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 scores[metric.id] = Math.round(sum / responses.length);
             }
         });
-        
-        // Now generate the 6-letter code (the method below assumes you iterate in metric order)
+
         const typeCode = generateAnimalCode(scores);
-        
-        // Display results
         displayResults(scores);
-        
-        // Update primary color based on dominant animal type
-        const animalType = getAnimalType(typeCode);
-        const dominantMetric = Object.keys(scores).reduce((a, b) => {
-            return Math.abs(scores[a] - 50) > Math.abs(scores[b] - 50) ? a : b;
-        });
-        
+
+        // Optionally update primary colour based on dominant metric (if your metrics define such colours)
+        const dominantMetric = Object.keys(scores).reduce((a, b) =>
+            Math.abs(scores[a] - 50) > Math.abs(scores[b] - 50) ? a : b
+        );
         const primaryColor = scores[dominantMetric] > 50 
             ? metrics.find(m => m.id === dominantMetric).colorPrimary 
             : metrics.find(m => m.id === dominantMetric).colorSecondary;
-        
         document.documentElement.style.setProperty('--primary-color', primaryColor);
-        
-        // Show results screen with animation
+
         showScreen('results-screen');
-        
-        // Create and animate the radar chart
         chart = createRadarChart(scores);
     }
-    
-    // Function to reset the assessment
+
+    // Function to reset the assessment by restarting it immediately
     function resetAssessment() {
-        // Destroy chart if it exists
-        if (chart) {
+        if(chart) {
             chart.destroy();
             chart = null;
         }
-        
-        // Show intro screen
-        showScreen('intro-screen');
+        startAssessment();
     }
-    
-    // Function to show a specific screen
+
+    // Efficient function to show a specific screen using the 'hidden' class
     function showScreen(screenId) {
-        // Hide all screens
-        document.querySelectorAll('.screen').forEach(screen => {
-            screen.classList.remove('active');
+        const screens = document.querySelectorAll('#question-screen, #results-screen, #loading-screen');
+        screens.forEach(screen => {
+            screen.classList.add('hidden');
         });
-        
-        // Show the specified screen
-        document.getElementById(screenId).classList.add('active');
+        const element = document.getElementById(screenId);
+        if (element) {
+            element.classList.remove('hidden');
+        }
     }
-    
-    // Function to generate the type code from scores.
+
+    // Function to generate the animal type code from metric scores
     function generateAnimalCode(scores) {
         let code = "";
         metrics.forEach(metric => {
             const score = scores[metric.id];
-            // If score > 50, choose the first letter; otherwise choose the second.
             code += (score > 50 ? metric.id[0] : metric.id[1]);
         });
         return code;
     }
-    
-    // Helper function to convert hex to RGB
+
+    // Helper: Convert hex to RGB if needed
     function hexToRgb(hex) {
         hex = hex.replace('#', '');
         const r = parseInt(hex.substring(0, 2), 16);
