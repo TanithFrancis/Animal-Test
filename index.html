@@ -3,52 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Personality Assessment</title>
+    <title>Animal Persona — Discover Your Inner Animal</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4A90E2",
+                        secondary: "#F5A623",
+                        background: "#fafafa",
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/animations.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-    <header>
-        <h1>Animal Personality Assessment</h1>
-        <nav>
-            <ul>
-                <li><a href="#intro">Home</a></li>
-                <li><a href="#metrics">What It Measures</a></li>
-                <li><a href="#personality-types">Personality Types</a></li>
-                <li><a href="test.html">Take the Test</a></li>
-            </ul>
-        </nav>
+<body class="bg-background text-gray-800">
+    <header class="bg-white shadow">
+        <div class="container mx-auto px-4 py-6 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-primary">Animal Persona</h1>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="#intro" class="text-primary hover:text-secondary">Home</a></li>
+                    <li><a href="#metrics" class="text-primary hover:text-secondary">What We Measure</a></li>
+                    <li><a href="#personality-types" class="text-primary hover:text-secondary">Types</a></li>
+                    <li>
+                        <a href="test.html" class="px-4 py-2 bg-primary text-white rounded shadow hover:bg-secondary">Take the Test</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </header>
     
     <main>
-        <section id="intro">
-            <h2>Welcome to Your Animal Personality Test</h2>
-            <p>This test reveals your unique personality through six key dimensions. It shows how you interact with the world and what drives your day-to-day choices. Discover which animal best represents you and what that means for your personal growth!</p>
+        <section id="hero" class="bg-gradient-to-r from-primary to-secondary text-white py-20">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-bold mb-4">Discover Your Inner Animal</h2>
+                <p class="text-lg mb-8">
+                    Explore a creative personality test that reveals your unique traits through animal symbolism.
+                    Uncover insights to fuel your personal growth!
+                </p>
+                <a href="test.html" class="inline-block px-6 py-3 bg-white text-primary font-semibold rounded shadow hover:bg-gray-100">
+                    Start Your Journey
+                </a>
+            </div>
         </section>
         
-        <section id="metrics">
-            <h2>What the Test Measures</h2>
-            <ul>
-                <li><strong>Extraversion vs. Introversion:</strong> Are you energized by the external world or by time spent alone?</li>
-                <li><strong>Intuition vs. Sensing:</strong> Do you tend to follow gut feelings/abstract ideas or focus on concrete details?</li>
-                <li><strong>Thinking vs. Feeling:</strong> When making decisions, do you value logic or personal values?</li>
-                <li><strong>Judging vs. Perceiving:</strong> Do you prefer planned, organized approaches over spontaneity?</li>
-                <li><strong>Assertive vs. Turbulent:</strong> How do you handle stress and self-confidence?</li>
-                <li><strong>Pragmatic vs. Idealistic:</strong> Do you lean toward practical choices, or are you driven by possibilities and values?</li>
-            </ul>
+        <section id="intro" class="py-12">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold text-primary mb-4">Welcome</h2>
+                <p class="text-lg">
+                    Animal Persona is designed to help you understand your character through six key dimensions.
+                    Our innovative test highlights your natural tendencies and reveals which animal best represents your personality.
+                </p>
+            </div>
         </section>
         
-        <section id="personality-types">
-            <h2>Explore Personality Types</h2>
-            <p>Want to learn more about what each type means? See our comprehensive guide presented in beautiful card form.</p>
-            <a href="types.html" class="btn">View Personality Cards</a>
+        <section id="metrics" class="py-12 bg-gray-100">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-primary text-center mb-8">What We Measure</h2>
+                <ul class="max-w-2xl mx-auto space-y-4 text-lg">
+                    <li><strong>Extraversion vs. Introversion:</strong> How you recharge – through social interactions or quiet reflection.</li>
+                    <li><strong>Intuition vs. Sensing:</strong> Whether you lean toward abstract ideas or focus on concrete details.</li>
+                    <li><strong>Thinking vs. Feeling:</strong> If you prioritize logic over personal values when making decisions.</li>
+                    <li><strong>Judging vs. Perceiving:</strong> Your preference for a structured plan over spontaneity.</li>
+                    <li><strong>Assertive vs. Turbulent:</strong> How you manage stress and maintain self-confidence.</li>
+                    <li><strong>Pragmatic vs. Idealistic:</strong> Whether you lean toward practical choices or pursue your ideals.</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="personality-types" class="py-12">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold text-primary mb-4">Explore Personality Types</h2>
+                <p class="text-lg mb-8">
+                    Learn more about each personality type through our immersive type cards. Each card details strengths, challenges, and growth opportunities tailored to your unique profile.
+                </p>
+                <a href="types.html" class="inline-block px-6 py-3 bg-primary text-white font-semibold rounded shadow hover:bg-secondary">
+                    View Personality Cards
+                </a>
+            </div>
         </section>
     </main>
     
-    <footer>
-        <p>&copy; 2023 Animal Personality Assessment</p>
+    <footer class="bg-white border-t mt-12">
+        <div class="container mx-auto px-4 py-6 text-center">
+            <p class="text-sm">&copy; 2023 Animal Persona. All Rights Reserved.</p>
+        </div>
     </footer>
 
     <div class="container">

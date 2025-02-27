@@ -35,97 +35,70 @@ document.addEventListener('DOMContentLoaded', function() {
         loadQuestion();
     }
     
-    // Function to load a question
+    // Function to load a question (ensuring the blue color is always used)
     function loadQuestion() {
-        // Get the current question
         const question = shuffledQuestions[currentQuestionIndex];
-        
-        // Update question text
         questionText.textContent = question.text;
-        
-        // Clear previous options
-        answerOptions.innerHTML = '';
-        
-        // Get the metric for this question
-        const metricId = question.metric;
-        const metric = metrics.find(m => m.id === metricId);
-        
-        // Get the appropriate color based on question direction
-        const buttonColor = question.direction === metricId[0] ? 
-                            metric.colorPrimary : 
-                            metric.colorSecondary;
-        
-        // Define the Likert scale text labels
+        answerOptions.innerHTML = "";
+
+        // Fixed blue color (primary) from our Tailwind config
+        const buttonColorClass = "bg-blue-500 text-white",
+              buttonDefaultClass = "bg-gray-100 text-gray-800";
+
         const likertLabels = [
             "Strongly Disagree",
-            "Disagree", 
+            "Disagree",
             "Slightly Disagree",
             "Neutral",
-            "Slightly Agree", 
+            "Slightly Agree",
             "Agree",
             "Strongly Agree"
         ];
-        
-        // Create container for options
-        const optionsContainer = document.createElement('div');
-        optionsContainer.className = 'likert-options-container';
-        
-        // Set a data attribute for the metric on the container
-        optionsContainer.dataset.metric = metricId;
-        
-        // Add each option as a button
+
+        const optionsContainer = document.createElement("div");
+        optionsContainer.className = "flex flex-col gap-4";
+
         likertLabels.forEach((label, index) => {
-            const button = document.createElement('button');
-            button.className = 'likert-button';
+            const button = document.createElement("button");
+            button.className = `likert-button px-4 py-3 rounded transition-colors ${buttonDefaultClass}`;
             button.textContent = label;
-            button.dataset.value = index + 1; // Store 1-7 as the value
-            
-            // Add click event
-            button.addEventListener('click', function() {
-                // Record response
+            button.dataset.value = index + 1;
+
+            button.addEventListener("click", function () {
                 recordResponse(question, parseInt(this.dataset.value));
-                
-                // Highlight selected button with the metric color
-                document.querySelectorAll('.likert-button').forEach(btn => {
-                    btn.classList.remove('selected');
-                });
-                this.classList.add('selected');
-                this.style.backgroundColor = buttonColor;
-                
-                // Move to next question after a brief delay
+
+                // Remove dynamic (non-blue) selections from all buttons.
+                document
+                    .querySelectorAll(".likert-button")
+                    .forEach((btn) => {
+                        btn.classList.remove("bg-blue-500", "text-white");
+                        btn.classList.add("bg-gray-100", "text-gray-800");
+                    });
+
+                // Mark the clicked button as selected.
+                this.classList.remove("bg-gray-100", "text-gray-800");
+                this.classList.add("bg-blue-500", "text-white");
+
+                // Brief delay before advancing.
                 setTimeout(() => {
                     nextQuestion();
                 }, 500);
             });
-            
+
             optionsContainer.appendChild(button);
         });
-        
-        // Add to DOM
+
         answerOptions.appendChild(optionsContainer);
-        
-        // Update question header with metric color
-        const questionHeader = document.querySelector('.question-header');
-        if (questionHeader) {
-            questionHeader.style.borderColor = buttonColor;
-        }
-        
-        // Update progress
+
+        // Update progress if applicable.
         updateProgress();
-        
-        // Set CSS variable for the current metric color
-        document.documentElement.style.setProperty('--current-metric-color', buttonColor);
-        
-        // Helper function to convert hex to RGB
-        function hexToRgb(hex) {
-            hex = hex.replace('#', '');
-            const r = parseInt(hex.substring(0, 2), 16);
-            const g = parseInt(hex.substring(2, 4), 16);
-            const b = parseInt(hex.substring(4, 6), 16);
-            return `${r}, ${g}, ${b}`;
+
+        // Ensure any question header styling remains blue (using Tailwind).
+        const questionHeader = document.querySelector(".question-header");
+        if (questionHeader) {
+            questionHeader.classList.remove("border-secondary");
+            questionHeader.classList.add("border-blue-500");
         }
-        
-        document.documentElement.style.setProperty('--current-metric-color-rgb', hexToRgb(buttonColor));
     }
     
     // Function to update progress indicators
@@ -277,5 +250,14 @@ document.addEventListener('DOMContentLoaded', function() {
             code += (score > 50 ? metric.id[0] : metric.id[1]);
         });
         return code;
+    }
+    
+    // Helper function to convert hex to RGB
+    function hexToRgb(hex) {
+        hex = hex.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        return `${r}, ${g}, ${b}`;
     }
 }); 
