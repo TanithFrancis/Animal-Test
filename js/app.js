@@ -5,30 +5,28 @@ const questions = Array.from({ length: 60 }, (_, i) => ({
     direction: "E"    // Dummy direction – adjust as needed
 }));
 
-// Dummy metrics array for calculation (must match your question.metric values)
+// Dummy metrics array for calculation
 const metrics = [
     { id: "EX", colorPrimary: "#66CC99", colorSecondary: "#8FBC8F" }
 ];
 
 // Main application logic
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize variables
     let currentQuestionIndex = 0;
     let userResponses = [];
     let chart = null;
     let shuffledQuestions = []; // Randomized questions array
 
-    // Get DOM elements (if they exist)
+    // DOM elements
     const startBtn = document.getElementById('start-btn'); // Only present on landing if used there
     const retakeBtn = document.getElementById('retake-btn');
     const questionText = document.getElementById('question-text');
     const answerOptions = document.getElementById('answer-options');
-    const progressFill = document.getElementById('progress-fill'); // Optional: if you have a progress bar
-    const questionCounter = document.getElementById('question-counter'); // Optional: if you show a question counter
-    const loadingMessage = document.getElementById('loading-message'); // Optional: for loading screen
+    const progressFill = document.getElementById('progress-fill'); // Optional: For progress bar updates
+    const questionCounter = document.getElementById('question-counter'); // Optional: For counter display
+    const loadingMessage = document.getElementById('loading-message'); // Optional: For loading screen
 
-    // Attach event listeners:
-    // On test.html, there is no start button – test starts automatically.
+    // Attach event listeners: start immediately if no button on the page
     if (startBtn) {
         startBtn.addEventListener('click', startAssessment);
     } else {
@@ -36,10 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (retakeBtn) {
         retakeBtn.addEventListener('click', function() {
-            if (chart) {
-                chart.destroy();
-                chart = null;
-            }
+            if (chart) { chart.destroy(); chart = null; }
             startAssessment();
         });
     }
@@ -48,15 +43,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function startAssessment() {
         currentQuestionIndex = 0;
         userResponses = [];
-        // Shuffle all questions (using a simple shuffle method)
         shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
         showScreen('question-screen');
         loadQuestion();
     }
 
-    // Function to load a question and display it
+    // Function to load and display the current question
     function loadQuestion() {
-        // If the test is completed, proceed to results.
         if (currentQuestionIndex >= shuffledQuestions.length) {
             showLoadingScreen();
             return;
@@ -66,11 +59,11 @@ document.addEventListener('DOMContentLoaded', function() {
         questionText.textContent = question.text;
         answerOptions.innerHTML = ""; // Clear previous answer options
 
-        // Define classes using the green theme.
-        // Default state buttons use light gray; the selected button will have the "bg-primary" (green) style.
+        // Define elegant button classes with a slight shadow
         const buttonDefaultClass = "bg-gray-100 text-gray-800";
         const buttonSelectedClass = "bg-primary text-white";
-
+        const baseButtonClasses = "px-4 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out ";
+        
         // Likert scale labels (for a 7‑point scale)
         const likertLabels = [
             "Strongly Disagree",
@@ -82,24 +75,23 @@ document.addEventListener('DOMContentLoaded', function() {
             "Strongly Agree"
         ];
 
-        // Create and append the answer option buttons
         const optionsContainer = document.createElement("div");
         optionsContainer.className = "flex flex-col gap-4";
 
         likertLabels.forEach((label, index) => {
             const button = document.createElement("button");
-            button.className = `px-4 py-3 rounded transition-colors ${buttonDefaultClass}`;
+            button.className = baseButtonClasses + buttonDefaultClass + " hover:shadow-md";
             button.textContent = label;
             button.dataset.value = index + 1; // Scale: 1 to 7
 
             button.addEventListener("click", function () {
                 recordResponse(question, parseInt(this.dataset.value));
-                // Clear selection from all buttons
+                // Clear selection styling on all buttons
                 optionsContainer.querySelectorAll("button").forEach((btn) => {
                     btn.classList.remove("bg-primary", "text-white");
                     btn.classList.add("bg-gray-100", "text-gray-800");
                 });
-                // Mark the selected button
+                // Apply selected styling
                 this.classList.remove("bg-gray-100", "text-gray-800");
                 this.classList.add("bg-primary", "text-white");
 
@@ -123,38 +115,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to update progress (if you have a progress bar or counter)
+    // Update progress (if you have a progress bar or counter)
     function updateProgress() {
-        if(progressFill && questionCounter && shuffledQuestions.length > 0){
+        if (progressFill && questionCounter && shuffledQuestions.length > 0) {
             const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
             progressFill.style.width = `${progress}%`;
             questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
         }
     }
 
-    // Record user response for each question
+    // Record the user's response for the current question
     function recordResponse(question, value) {
-        const normalizedValue = value - 1; // Convert scale of 1-7 to 0-6
+        const normalizedValue = value - 1; // Convert 1–7 scale to 0–6
         let score;
         if (question.direction === question.metric[0]) {
             score = (normalizedValue / 6) * 100;
         } else {
             score = ((6 - normalizedValue) / 6) * 100;
         }
-        userResponses.push({
-            question: question,
-            value: value,
-            score: score
-        });
+        userResponses.push({ question, value, score });
     }
 
-    // Function to show a loading screen then calculate results
+    // Show a loading screen before calculating results
     function showLoadingScreen() {
         showScreen('loading-screen');
         let progress = 0;
         const interval = setInterval(() => {
             progress += 5;
-            if(loadingMessage){
+            if (loadingMessage) {
                 loadingMessage.textContent = `Analyzing your responses... ${progress}%`;
             }
             if (progress >= 100) {
@@ -166,16 +154,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     }
 
-    // Function to calculate results and display them
+    // Calculate results and display them
     function calculateResults() {
         const scores = {};
-        
-        // Initialize metrics at a neutral score; assume 'metrics' is a global array.
         metrics.forEach(metric => {
             scores[metric.id] = 50;
         });
 
-        // Group responses by metric
         const metricResponses = {};
         metrics.forEach(metric => {
             metricResponses[metric.id] = [];
@@ -186,7 +171,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Calculate averages
         metrics.forEach(metric => {
             const responses = metricResponses[metric.id];
             if (responses.length > 0) {
@@ -198,7 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const typeCode = generateAnimalCode(scores);
         displayResults(scores);
 
-        // Optionally update primary colour based on dominant metric (if your metrics define such colours)
         const dominantMetric = Object.keys(scores).reduce((a, b) =>
             Math.abs(scores[a] - 50) > Math.abs(scores[b] - 50) ? a : b
         );
@@ -208,31 +191,31 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.style.setProperty('--primary-color', primaryColor);
 
         showScreen('results-screen');
-        chart = createRadarChart(scores);
+        if (typeof createRadarChart === 'function') {
+            chart = createRadarChart(scores);
+        }
     }
 
-    // Function to reset the assessment by restarting it immediately
+    // Reset the assessment for the "Retake Test" functionality
     function resetAssessment() {
-        if(chart) {
+        if (chart) {
             chart.destroy();
             chart = null;
         }
         startAssessment();
     }
 
-    // Efficient function to show a specific screen using the 'hidden' class
+    // Show a specific screen by its ID (hiding others with the 'hidden' class)
     function showScreen(screenId) {
         const screens = document.querySelectorAll('#question-screen, #results-screen, #loading-screen');
-        screens.forEach(screen => {
-            screen.classList.add('hidden');
-        });
+        screens.forEach(screen => screen.classList.add('hidden'));
         const element = document.getElementById(screenId);
         if (element) {
             element.classList.remove('hidden');
         }
     }
 
-    // Function to generate the animal type code from metric scores
+    // Generate a dummy animal type code from metric scores
     function generateAnimalCode(scores) {
         let code = "";
         metrics.forEach(metric => {
@@ -242,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return code;
     }
 
-    // Helper: Convert hex to RGB if needed
+    // Helper: Convert a hex color to an RGB string if needed
     function hexToRgb(hex) {
         hex = hex.replace('#', '');
         const r = parseInt(hex.substring(0, 2), 16);
