@@ -350,11 +350,16 @@ p {
 .chart-container {
     position: relative;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     margin: 0 auto;
     height: auto;
     aspect-ratio: 1/1;
-    padding: 20px;
+    padding: 40px;
+}
+
+#results-chart {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .results-breakdown {

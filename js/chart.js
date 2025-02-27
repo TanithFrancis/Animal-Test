@@ -5,12 +5,12 @@ function createRadarChart(scores) {
     
     // Prepare data for the chart
     const data = {
-        labels: metrics.map(m => m.name),
+        labels: metrics.map(m => `${m.poles[0]} - ${m.poles[1]}`),
         datasets: [{
             label: 'Your Personality Profile',
             data: metrics.map(m => scores[m.id]),
-            backgroundColor: 'rgba(74, 144, 226, 0.2)',
-            borderColor: 'rgba(74, 144, 226, 0.8)',
+            backgroundColor: 'rgba(102, 204, 153, 0.2)',
+            borderColor: 'rgba(102, 204, 153, 0.8)',
             borderWidth: 2,
             pointBackgroundColor: metrics.map(m => {
                 const score = scores[m.id];
@@ -18,13 +18,13 @@ function createRadarChart(scores) {
             }),
             pointBorderColor: '#fff',
             pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgba(74, 144, 226, 1)',
+            pointHoverBorderColor: 'rgba(102, 204, 153, 1)',
             pointRadius: 5,
             pointHoverRadius: 7
         }]
     };
     
-    // Chart configuration with added animations
+    // Chart configuration
     const config = {
         type: 'radar',
         data: data,
@@ -41,12 +41,21 @@ function createRadarChart(scores) {
                     suggestedMax: 100,
                     ticks: {
                         stepSize: 20,
-                        backdropColor: 'transparent'
+                        backdropColor: 'transparent',
+                        font: {
+                            size: 10
+                        }
                     },
                     pointLabels: {
                         font: {
-                            size: 12,
-                            family: "'Poppins', sans-serif"
+                            size: 14,
+                            family: "'Quicksand', sans-serif",
+                            weight: '600'
+                        },
+                        padding: 20,
+                        callback: function(label) {
+                            const words = label.split(' - ');
+                            return [words[0], words[1]];
                         }
                     }
                 }
@@ -62,7 +71,7 @@ function createRadarChart(scores) {
                             const score = context.raw;
                             const pole = score > 50 ? metricId[0] : metricId[1];
                             const poleName = metrics[context.dataIndex].poles[pole === metricId[0] ? 0 : 1];
-                            return `${poleName}: ${score}%`;
+                            return `${poleName}: ${Math.abs(score - 50) * 2}%`;
                         }
                     }
                 }
@@ -72,17 +81,13 @@ function createRadarChart(scores) {
                     tension: 0.2
                 }
             },
-            // Animation configurations
             animation: {
                 duration: 2000,
-                easing: 'easeOutQuart',
-                delay: (context) => {
-                    return context.dataIndex * 100;
-                }
+                easing: 'easeOutQuart'
             }
         }
     };
     
-    // Create the chart
+    // Create and return the chart
     return new Chart(ctx, config);
 } 
