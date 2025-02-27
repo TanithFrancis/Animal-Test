@@ -50,7 +50,7 @@ function displayResults(scores) {
     
     metrics.forEach(metric => {
         const score = scores[metric.id];
-        const dominantPole = score > 50 ? 0 : 1; // 0 for first letter, 1 for second
+        const dominantPole = score > 50 ? 0 : 1;
         const dominantColor = dominantPole === 0 ? metric.colorPrimary : metric.colorSecondary;
         
         const dimensionDiv = document.createElement('div');
@@ -61,6 +61,7 @@ function displayResults(scores) {
         
         const nameSpan = document.createElement('span');
         nameSpan.textContent = metric.name;
+        nameSpan.className = 'font-semibold';
         
         const scoreSpan = document.createElement('span');
         scoreSpan.textContent = `${Math.abs(score - 50) * 2}% ${metric.poles[dominantPole]}`;
@@ -76,7 +77,13 @@ function displayResults(scores) {
         fillDiv.className = 'dimension-fill';
         fillDiv.style.backgroundColor = dominantColor;
         fillDiv.style.width = `${score}%`;
-        fillDiv.style.setProperty('--fill-width', `${score}%`);
+        
+        const scaleDiv = document.createElement('div');
+        scaleDiv.className = 'dimension-scale';
+        scaleDiv.innerHTML = `
+            <span>${metric.poles[0]}</span>
+            <span>${metric.poles[1]}</span>
+        `;
         
         barDiv.appendChild(fillDiv);
         
@@ -86,6 +93,7 @@ function displayResults(scores) {
         
         dimensionDiv.appendChild(headerDiv);
         dimensionDiv.appendChild(barDiv);
+        dimensionDiv.appendChild(scaleDiv);
         dimensionDiv.appendChild(descriptionDiv);
         
         dimensionsBreakdown.appendChild(dimensionDiv);

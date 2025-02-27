@@ -364,38 +364,53 @@ p {
 }
 
 #dimensions-breakdown {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md);
 }
 
 .dimension {
-    display: flex;
-    flex-direction: column;
+    background: white;
+    padding: var(--spacing-md);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .dimension-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: var(--spacing-xs);
+    align-items: center;
+    margin-bottom: var(--spacing-md);
 }
 
 .dimension-bar {
-    height: 10px;
-    background-color: var(--border-color);
-    border-radius: 5px;
+    height: 12px;
+    background-color: #edf2f7;
+    border-radius: 6px;
     overflow: hidden;
-    margin-bottom: var(--spacing-xs);
+    margin: var(--spacing-sm) 0;
+    position: relative;
 }
 
 .dimension-fill {
     height: 100%;
-    border-radius: 5px;
+    transition: width 1s ease-out;
+}
+
+.dimension-scale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: #718096;
+    margin-top: 4px;
 }
 
 .dimension-description {
+    margin-top: var(--spacing-sm);
     font-size: 0.9rem;
-    color: var(--light-text);
+    color: #4a5568;
+    line-height: 1.5;
 }
 
 .animal-description {
