@@ -58,8 +58,27 @@
       <div id="results-screen" class="hidden">
         <div class="bg-white rounded-lg shadow p-8">
           <h2 class="text-3xl font-bold text-primary mb-4">Your Results</h2>
-          <div id="results-details" class="mb-4"></div>
-          <canvas id="results-chart" class="mx-auto"></canvas>
+          <div id="results-details">
+            <h3 id="animal-name" class="text-2xl font-semibold"></h3>
+            <p id="animal-code" class="mb-2"></p>
+            <img id="animal-image" src="" alt="Animal Image" class="mx-auto mb-4"/>
+            <p id="animal-description" class="mb-4"></p>
+            <h4 class="text-xl font-semibold">Strengths</h4>
+            <ul id="strengths-list" class="list-disc ml-5 mb-4"></ul>
+            <h4 class="text-xl font-semibold">Challenges</h4>
+            <ul id="challenges-list" class="list-disc ml-5 mb-4"></ul>
+            <h4 class="text-xl font-semibold">Compatible Types</h4>
+            <div id="compatible-types" class="mb-4"></div>
+            <h4 class="text-xl font-semibold">Growth Areas</h4>
+            <p id="growth-areas" class="mb-4"></p>
+            <div id="dimensions-breakdown" class="mb-4"></div>
+          </div>
+          <canvas id="results-chart" class="mx-auto my-4"></canvas>
+          <div id="qr-code" class="my-4"></div>
+          <div class="flex justify-center space-x-4 mb-4">
+            <button id="whatsapp-share" class="px-6 py-3 bg-green-500 text-white font-semibold rounded shadow transition-all hover:bg-green-600">Share on WhatsApp</button>
+            <button id="download-results" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded shadow transition-all hover:bg-blue-600">Download Results</button>
+          </div>
           <div class="mt-6 text-center">
             <button id="retake-btn" class="px-6 py-3 bg-primary text-white font-semibold rounded shadow transition-all hover:bg-secondary">
               Retake Test
@@ -85,10 +104,16 @@
     </div>
   </footer>
 
-  <!-- Include your questions file -->
+  <!-- Script Inclusions -->
+  <!-- Include your questions file first -->
   <script src="js/questions.js"></script>
-  <!-- Then include the app logic -->
+  <!-- Include animals.js so getAnimalType is available -->
+  <script src="js/animals.js"></script>
+  <!-- Then include your application logic -->
   <script src="js/app.js"></script>
+  <!-- Include chart.js and results.js for displaying results -->
+  <script src="js/chart.js"></script>
+  <script src="js/results.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof startAssessment === 'function') {
