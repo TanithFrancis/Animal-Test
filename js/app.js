@@ -1,3 +1,15 @@
+// Global dummy definitions – replace with real data as needed
+const questions = Array.from({ length: 60 }, (_, i) => ({
+    text: `Question ${i + 1}: How much do you agree with this statement?`,
+    metric: "EX",     // Dummy metric value
+    direction: "E"    // Dummy direction – adjust as needed
+}));
+
+// Dummy metrics array for calculation (must match your question.metric values)
+const metrics = [
+    { id: "EX", colorPrimary: "#66CC99", colorSecondary: "#8FBC8F" }
+];
+
 // Main application logic
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize variables
@@ -7,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let shuffledQuestions = []; // Randomized questions array
 
     // Get DOM elements (if they exist)
-    const startBtn = document.getElementById('start-btn'); // May not exist on test.html
+    const startBtn = document.getElementById('start-btn'); // Only present on landing if used there
     const retakeBtn = document.getElementById('retake-btn');
     const questionText = document.getElementById('question-text');
     const answerOptions = document.getElementById('answer-options');
@@ -22,19 +34,21 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         startAssessment();
     }
-    retakeBtn.addEventListener('click', function() {
-        if (chart) {
-            chart.destroy();
-            chart = null;
-        }
-        startAssessment();
-    });
+    if (retakeBtn) {
+        retakeBtn.addEventListener('click', function() {
+            if (chart) {
+                chart.destroy();
+                chart = null;
+            }
+            startAssessment();
+        });
+    }
 
     // Function to start the assessment
     function startAssessment() {
         currentQuestionIndex = 0;
         userResponses = [];
-        // Shuffle ALL questions (assuming a global 'questions' array exists)
+        // Shuffle all questions (using a simple shuffle method)
         shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
         showScreen('question-screen');
         loadQuestion();
@@ -52,11 +66,12 @@ document.addEventListener('DOMContentLoaded', function() {
         questionText.textContent = question.text;
         answerOptions.innerHTML = ""; // Clear previous answer options
 
-        // Use your green theme for selections:
-        // Selected answer style uses primary which is defined in Tailwind config as "#66CC99".
-        const buttonColorClass = "bg-primary text-white";
+        // Define classes using the green theme.
+        // Default state buttons use light gray; the selected button will have the "bg-primary" (green) style.
         const buttonDefaultClass = "bg-gray-100 text-gray-800";
+        const buttonSelectedClass = "bg-primary text-white";
 
+        // Likert scale labels (for a 7‑point scale)
         const likertLabels = [
             "Strongly Disagree",
             "Disagree",
@@ -67,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
             "Strongly Agree"
         ];
 
+        // Create and append the answer option buttons
         const optionsContainer = document.createElement("div");
         optionsContainer.className = "flex flex-col gap-4";
 
@@ -74,20 +90,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const button = document.createElement("button");
             button.className = `px-4 py-3 rounded transition-colors ${buttonDefaultClass}`;
             button.textContent = label;
-            button.dataset.value = index + 1; // Scale is 1 to 7
+            button.dataset.value = index + 1; // Scale: 1 to 7
 
             button.addEventListener("click", function () {
                 recordResponse(question, parseInt(this.dataset.value));
-                // Remove selection styles from all buttons in the container
+                // Clear selection from all buttons
                 optionsContainer.querySelectorAll("button").forEach((btn) => {
                     btn.classList.remove("bg-primary", "text-white");
                     btn.classList.add("bg-gray-100", "text-gray-800");
                 });
-                // Mark the clicked button as selected with the green theme
+                // Mark the selected button
                 this.classList.remove("bg-gray-100", "text-gray-800");
                 this.classList.add("bg-primary", "text-white");
 
-                // Brief delay before advancing
+                // Advance to the next question after a brief delay
                 setTimeout(() => {
                     currentQuestionIndex++;
                     loadQuestion();
@@ -99,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         answerOptions.appendChild(optionsContainer);
         updateProgress();
 
-        // Update question header border to use primary (green)
+        // Ensure the question header border uses the primary (green) color
         const questionHeader = document.querySelector(".question-header");
         if (questionHeader) {
             questionHeader.classList.remove("border-secondary");
