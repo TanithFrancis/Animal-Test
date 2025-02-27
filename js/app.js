@@ -150,7 +150,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calculate results and display them
     function calculateResults() {
         const scores = {};
-        // Use the global metrics from questions.js
         metrics.forEach(metric => {
             scores[metric.id] = 50;
         });
@@ -159,6 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         metrics.forEach(metric => {
             metricResponses[metric.id] = [];
         });
+        
         userResponses.forEach(response => {
             if (metricResponses[response.question.metric]) {
                 metricResponses[response.question.metric].push(response);
@@ -173,19 +173,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
+        // First show the results screen
+        showScreen('results-screen');
+        
+        // Then generate the type code and display results
         const typeCode = generateAnimalCode(scores);
         displayResults(scores);
 
+        // Update the primary color
         const dominantMetric = Object.keys(scores).reduce((a, b) =>
             Math.abs(scores[a] - 50) > Math.abs(scores[b] - 50) ? a : b
         );
-        // Use primary and secondary colors from the global metrics array
         const primaryColor = scores[dominantMetric] > 50 
             ? metrics.find(m => m.id === dominantMetric).colorPrimary 
             : metrics.find(m => m.id === dominantMetric).colorSecondary;
         document.documentElement.style.setProperty('--primary-color', primaryColor);
 
-        showScreen('results-screen');
+        // Create the radar chart last
         if (typeof createRadarChart === 'function') {
             chart = createRadarChart(scores);
         }
