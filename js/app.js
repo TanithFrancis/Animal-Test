@@ -1,9 +1,4 @@
-// Global dummy definitions – replace with real data as needed
-const questions = Array.from({ length: 60 }, (_, i) => ({
-    text: `Question ${i + 1}: How much do you agree with this statement?`,
-    metric: "EX",     // Dummy metric value
-    direction: "E"    // Dummy direction – adjust as needed
-}));
+// Assumes that questions.js defines a global variable `questions` containing your 60 question objects.
 
 // Dummy metrics array for calculation
 const metrics = [
@@ -43,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function startAssessment() {
         currentQuestionIndex = 0;
         userResponses = [];
+        // Randomize questions (assumes `questions` is defined in questions.js)
         shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
         showScreen('question-screen');
         loadQuestion();
@@ -56,15 +52,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const question = shuffledQuestions[currentQuestionIndex];
-        questionText.textContent = question.text;
+        // Display the current question number followed by the actual question statement from questions.js
+        questionText.innerHTML = `<span class="block text-xl font-bold mb-2">
+          Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}:
+        </span> ${question.text}`;
         answerOptions.innerHTML = ""; // Clear previous answer options
 
-        // Define elegant button classes with a slight shadow
+        // Define elegant button styles with a slight shadow
         const buttonDefaultClass = "bg-gray-100 text-gray-800";
         const buttonSelectedClass = "bg-primary text-white";
         const baseButtonClasses = "px-4 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out ";
-        
-        // Likert scale labels (for a 7‑point scale)
+
+        // Likert scale labels for a 7‑point scale
         const likertLabels = [
             "Strongly Disagree",
             "Disagree",
@@ -86,12 +85,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             button.addEventListener("click", function () {
                 recordResponse(question, parseInt(this.dataset.value));
-                // Clear selection styling on all buttons
+                // Clear selection styling on all buttons in the container
                 optionsContainer.querySelectorAll("button").forEach((btn) => {
                     btn.classList.remove("bg-primary", "text-white");
                     btn.classList.add("bg-gray-100", "text-gray-800");
                 });
-                // Apply selected styling
+                // Apply selected styling using the green theme
                 this.classList.remove("bg-gray-100", "text-gray-800");
                 this.classList.add("bg-primary", "text-white");
 
@@ -107,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         answerOptions.appendChild(optionsContainer);
         updateProgress();
 
-        // Ensure the question header border uses the primary (green) color
+        // (Optional) Ensure the question header border uses the primary (green) color
         const questionHeader = document.querySelector(".question-header");
         if (questionHeader) {
             questionHeader.classList.remove("border-secondary");
@@ -115,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Update progress (if you have a progress bar or counter)
+    // Update progress (if a progress bar or counter is used)
     function updateProgress() {
         if (progressFill && questionCounter && shuffledQuestions.length > 0) {
             const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
@@ -196,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Reset the assessment for the "Retake Test" functionality
+    // Reset the assessment for "Retake Test"
     function resetAssessment() {
         if (chart) {
             chart.destroy();
@@ -205,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
         startAssessment();
     }
 
-    // Show a specific screen by its ID (hiding others with the 'hidden' class)
+    // Utility function to show a specific screen by its ID (hiding others with the 'hidden' class)
     function showScreen(screenId) {
         const screens = document.querySelectorAll('#question-screen, #results-screen, #loading-screen');
         screens.forEach(screen => screen.classList.add('hidden'));
@@ -215,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Generate a dummy animal type code from metric scores
+    // Generate a dummy animal type code from metric scores.
     function generateAnimalCode(scores) {
         let code = "";
         metrics.forEach(metric => {
@@ -225,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return code;
     }
 
-    // Helper: Convert a hex color to an RGB string if needed
+    // Helper: Convert a hex color to an RGB string if needed.
     function hexToRgb(hex) {
         hex = hex.replace('#', '');
         const r = parseInt(hex.substring(0, 2), 16);
