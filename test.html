@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Take the Test - Animal Persona</title>
+  <!-- Import Quicksand from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#66CC99",       /* Calm greenish-teal */
+            secondary: "#8FBC8F",     /* Complementary soft green */
+            background: "#F0F4F8",    /* Light, airy background */
+          },
+          fontFamily: {
+            sans: ['Quicksand', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body class="bg-background text-gray-800">
+  <!-- Header -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto flex items-center justify-between px-4 py-6">
+      <h1 class="text-2xl font-bold text-primary">Animal Persona</h1>
+      <nav>
+        <ul class="flex space-x-6">
+          <li>
+            <a href="index.html" class="text-primary hover:text-secondary">
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="types.html" class="text-primary hover:text-secondary">
+              Types
+            </a>
+          </li>
+          <li>
+            <a href="test.html" class="px-6 py-3 bg-primary text-white font-semibold rounded shadow transition-all hover:bg-secondary">
+              Take the Test
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Test Content -->
+  <main class="container mx-auto px-4 py-12">
+    <!-- Start Test Section (no extra intro-screen container) -->
+    <div class="flex flex-col items-center justify-center">
+      <button id="start-btn" class="px-8 py-4 bg-primary text-white font-semibold rounded shadow transition-all hover:bg-secondary">
+        Start Test
+      </button>
+    </div>
+    <!-- Test screen (hidden by default; app.js will toggle display) -->
+    <div id="test-screen" class="mt-8 hidden">
+      <!-- Question Screen -->
+      <div id="question-screen">
+        <div class="question-header border-b-4 border-blue-500 mb-6">
+          <h2 id="question-text" class="text-2xl font-semibold mb-4"></h2>
+        </div>
+        <div id="answer-options"></div>
+      </div>
+      <!-- Results Screen -->
+      <div id="results-screen" class="hidden">
+        <div class="bg-white rounded-lg shadow p-8">
+          <h2 class="text-3xl font-bold text-primary mb-4">Your Results</h2>
+          <div id="results-details" class="mb-4"></div>
+          <canvas id="results-chart" class="mx-auto"></canvas>
+          <div class="mt-6 text-center">
+            <button id="retake-btn" class="px-6 py-3 bg-primary text-white font-semibold rounded shadow transition-all hover:bg-secondary">
+              Retake Test
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t">
+    <div class="container mx-auto px-4 py-6 text-center">
+      <p class="text-sm">&copy; 2023 Animal Persona. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Main App JS (which handles starting the test, loading questions, etc.) -->
+  <script src="js/app.js"></script>
+</body>
+</html> 
