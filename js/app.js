@@ -173,25 +173,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // First show the results screen
-        showScreen('results-screen');
+        // IMPORTANT: First hide all screens
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.add('hidden');
+        });
         
-        // Then generate the type code and display results
-        const typeCode = generateAnimalCode(scores);
-        displayResults(scores);
-
-        // Update the primary color
-        const dominantMetric = Object.keys(scores).reduce((a, b) =>
-            Math.abs(scores[a] - 50) > Math.abs(scores[b] - 50) ? a : b
-        );
-        const primaryColor = scores[dominantMetric] > 50 
-            ? metrics.find(m => m.id === dominantMetric).colorPrimary 
-            : metrics.find(m => m.id === dominantMetric).colorSecondary;
-        document.documentElement.style.setProperty('--primary-color', primaryColor);
-
-        // Create the radar chart last
-        if (typeof createRadarChart === 'function') {
-            chart = createRadarChart(scores);
+        // Then show the results screen
+        const resultsScreen = document.getElementById('results-screen');
+        if (resultsScreen) {
+            resultsScreen.classList.remove('hidden');
+        }
+        
+        // Then call displayResults to generate and show the results
+        if (typeof displayResults === 'function') {
+            displayResults(scores);
         }
     }
 

@@ -55,74 +55,76 @@
         <div id="answer-options"></div>
       </div>
       <!-- Results Screen (hidden by default) -->
-      <div id="results-screen" class="hidden">
-        <h2 class="text-3xl font-bold text-primary text-center mb-8">Your Animal Personality</h2>
-        
-        <div class="results-container">
-          <!-- Animal Result Card -->
-          <div class="animal-result">
-            <img id="animal-image" src="" alt="Your animal type">
-            <h2 id="animal-name">Animal Name</h2>
-            <div id="animal-code" class="animal-code">XXXXXX</div>
-          </div>
+      <div id="results-screen" class="screen">
+        <div class="container mx-auto px-4 py-8">
+          <h2 class="text-3xl font-bold text-primary text-center mb-8">Your Animal Personality</h2>
           
-          <!-- Chart Section -->
-          <div class="chart-container">
-            <canvas id="results-chart"></canvas>
-          </div>
-          
-          <!-- Dimensions Breakdown -->
-          <div class="results-breakdown">
-            <h3>Your Personality Dimensions</h3>
-            <div id="dimensions-breakdown"></div>
-          </div>
-          
-          <!-- Animal Description -->
-          <div class="animal-description">
-            <h3>About Your Type</h3>
-            <p id="animal-description"></p>
+          <div class="results-container">
+            <!-- Animal Result Card -->
+            <div class="animal-result">
+              <img id="animal-image" src="" alt="Your animal type">
+              <h2 id="animal-name">Animal Name</h2>
+              <div id="animal-code" class="animal-code">XXXXXX</div>
+            </div>
             
-            <div class="traits-container">
-              <div class="strengths">
-                <h4>Strengths</h4>
-                <ul id="strengths-list"></ul>
+            <!-- Chart Section -->
+            <div class="chart-container">
+              <canvas id="results-chart"></canvas>
+            </div>
+            
+            <!-- Dimensions Breakdown -->
+            <div class="results-breakdown">
+              <h3>Your Personality Dimensions</h3>
+              <div id="dimensions-breakdown"></div>
+            </div>
+            
+            <!-- Animal Description -->
+            <div class="animal-description">
+              <h3>About Your Type</h3>
+              <p id="animal-description"></p>
+              
+              <div class="traits-container">
+                <div class="strengths">
+                  <h4>Strengths</h4>
+                  <ul id="strengths-list"></ul>
+                </div>
+                <div class="challenges">
+                  <h4>Challenges</h4>
+                  <ul id="challenges-list"></ul>
+                </div>
               </div>
-              <div class="challenges">
-                <h4>Challenges</h4>
-                <ul id="challenges-list"></ul>
+              
+              <div class="compatibility">
+                <h4>Compatible With</h4>
+                <div id="compatible-types"></div>
+              </div>
+              
+              <div class="growth">
+                <h4>Growth Areas</h4>
+                <p id="growth-areas"></p>
               </div>
             </div>
             
-            <div class="compatibility">
-              <h4>Compatible With</h4>
-              <div id="compatible-types"></div>
+            <!-- Share Container -->
+            <div class="share-container">
+              <h3>Share Your Results</h3>
+              <div class="share-buttons">
+                <button id="whatsapp-share" class="share-btn whatsapp">
+                  Share to WhatsApp
+                </button>
+                <button id="download-results" class="share-btn download">
+                  Download Results
+                </button>
+              </div>
+              <div class="qr-container">
+                <p>Let others take the test:</p>
+                <div id="qr-code"></div>
+              </div>
             </div>
             
-            <div class="growth">
-              <h4>Growth Areas</h4>
-              <p id="growth-areas"></p>
-            </div>
+            <!-- Retake Button -->
+            <button id="retake-btn">Retake Assessment</button>
           </div>
-          
-          <!-- Share Container -->
-          <div class="share-container">
-            <h3>Share Your Results</h3>
-            <div class="share-buttons">
-              <button id="whatsapp-share" class="share-btn whatsapp">
-                Share to WhatsApp
-              </button>
-              <button id="download-results" class="share-btn download">
-                Download Results
-              </button>
-            </div>
-            <div class="qr-container">
-              <p>Let others take the test:</p>
-              <div id="qr-code"></div>
-            </div>
-          </div>
-          
-          <!-- Retake Button -->
-          <button id="retake-btn">Retake Assessment</button>
         </div>
       </div>
       <div id="loading-screen" class="hidden">
