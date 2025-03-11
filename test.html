@@ -56,34 +56,73 @@
       </div>
       <!-- Results Screen (hidden by default) -->
       <div id="results-screen" class="hidden">
-        <div class="bg-white rounded-lg shadow p-8">
-          <h2 class="text-3xl font-bold text-primary mb-4">Your Results</h2>
-          <div id="results-details">
-            <h3 id="animal-name" class="text-2xl font-semibold"></h3>
-            <p id="animal-code" class="mb-2"></p>
-            <img id="animal-image" src="" alt="Animal Image" class="mx-auto mb-4"/>
-            <p id="animal-description" class="mb-4"></p>
-            <h4 class="text-xl font-semibold">Strengths</h4>
-            <ul id="strengths-list" class="list-disc ml-5 mb-4"></ul>
-            <h4 class="text-xl font-semibold">Challenges</h4>
-            <ul id="challenges-list" class="list-disc ml-5 mb-4"></ul>
-            <h4 class="text-xl font-semibold">Compatible Types</h4>
-            <div id="compatible-types" class="mb-4"></div>
-            <h4 class="text-xl font-semibold">Growth Areas</h4>
-            <p id="growth-areas" class="mb-4"></p>
-            <div id="dimensions-breakdown" class="mb-4"></div>
+        <h2 class="text-3xl font-bold text-primary text-center mb-8">Your Animal Personality</h2>
+        
+        <div class="results-container">
+          <!-- Animal Result Card -->
+          <div class="animal-result">
+            <img id="animal-image" src="" alt="Your animal type">
+            <h2 id="animal-name">Animal Name</h2>
+            <div id="animal-code" class="animal-code">XXXXXX</div>
           </div>
-          <canvas id="results-chart" class="mx-auto my-4"></canvas>
-          <div id="qr-code" class="my-4"></div>
-          <div class="flex justify-center space-x-4 mb-4">
-            <button id="whatsapp-share" class="px-6 py-3 bg-green-500 text-white font-semibold rounded shadow transition-all hover:bg-green-600">Share on WhatsApp</button>
-            <button id="download-results" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded shadow transition-all hover:bg-blue-600">Download Results</button>
+          
+          <!-- Chart Section -->
+          <div class="chart-container">
+            <canvas id="results-chart"></canvas>
           </div>
-          <div class="mt-6 text-center">
-            <button id="retake-btn" class="px-6 py-3 bg-primary text-white font-semibold rounded shadow transition-all hover:bg-secondary">
-              Retake Test
-            </button>
+          
+          <!-- Dimensions Breakdown -->
+          <div class="results-breakdown">
+            <h3>Your Personality Dimensions</h3>
+            <div id="dimensions-breakdown"></div>
           </div>
+          
+          <!-- Animal Description -->
+          <div class="animal-description">
+            <h3>About Your Type</h3>
+            <p id="animal-description"></p>
+            
+            <div class="traits-container">
+              <div class="strengths">
+                <h4>Strengths</h4>
+                <ul id="strengths-list"></ul>
+              </div>
+              <div class="challenges">
+                <h4>Challenges</h4>
+                <ul id="challenges-list"></ul>
+              </div>
+            </div>
+            
+            <div class="compatibility">
+              <h4>Compatible With</h4>
+              <div id="compatible-types"></div>
+            </div>
+            
+            <div class="growth">
+              <h4>Growth Areas</h4>
+              <p id="growth-areas"></p>
+            </div>
+          </div>
+          
+          <!-- Share Container -->
+          <div class="share-container">
+            <h3>Share Your Results</h3>
+            <div class="share-buttons">
+              <button id="whatsapp-share" class="share-btn whatsapp">
+                Share to WhatsApp
+              </button>
+              <button id="download-results" class="share-btn download">
+                Download Results
+              </button>
+            </div>
+            <div class="qr-container">
+              <p>Let others take the test:</p>
+              <div id="qr-code"></div>
+            </div>
+          </div>
+          
+          <!-- Retake Button -->
+          <button id="retake-btn">Retake Assessment</button>
         </div>
       </div>
       <div id="loading-screen" class="hidden">
