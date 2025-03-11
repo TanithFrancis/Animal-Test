@@ -418,15 +418,16 @@ p {
 }
 
 .dimension {
-    background: #f8f9fa;
+    background: white;
     padding: 1.5rem;
     border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     transition: transform 0.2s ease;
 }
 
 .dimension:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
 }
 
 .dimension-header {
@@ -436,40 +437,96 @@ p {
     margin-bottom: 1rem;
 }
 
-.dimension-header span:first-child {
+.dimension-title {
     font-weight: 600;
     font-size: 1.1rem;
+    color: #333;
 }
 
-.dimension-header span:last-child {
+.dimension-score {
     font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    color: white;
 }
 
-.dimension-bar {
-    height: 12px;
-    background-color: #e9ecef;
-    border-radius: 6px;
-    overflow: hidden;
-    margin: 0.75rem 0;
+/* Scale Container */
+.scale-container {
+    position: relative;
+    height: 40px;
+    margin: 1.5rem 0;
 }
 
-.dimension-fill {
-    height: 100%;
-    transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+.scale-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(to right, 
+        var(--left-color, #3366CC) 0%, 
+        var(--left-color, #3366CC) 50%, 
+        var(--right-color, #FF9933) 50%, 
+        var(--right-color, #FF9933) 100%);
+    border-radius: 4px;
+    transform: translateY(-50%);
 }
 
-.dimension-scale {
+.scale-marker {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 3px solid var(--marker-color, #66CC99);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: left 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+    z-index: 2;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.scale-labels {
     display: flex;
     justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.scale-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.scale-label.active {
+    background-color: rgba(0,0,0,0.05);
+    transform: scale(1.05);
+}
+
+.scale-percentage {
+    position: absolute;
+    top: -25px;
+    transform: translateX(-50%);
     font-size: 0.85rem;
-    color: #6c757d;
-    margin-bottom: 0.75rem;
+    font-weight: 700;
+    color: var(--marker-color, #66CC99);
+    background: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: left 1.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .dimension-description {
     font-size: 0.95rem;
     line-height: 1.5;
     color: #495057;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
 }
 
 /* Animal Description */
