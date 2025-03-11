@@ -3,12 +3,20 @@ function createRadarChart(scores) {
     // Get the canvas element
     const ctx = document.getElementById('results-chart').getContext('2d');
     
-    // Prepare data for the chart
+    // Prepare data for the chart correctly showing dominant poles
     const data = {
-        labels: metrics.map(m => `${m.poles[0]} - ${m.poles[1]}`),
+        labels: metrics.map(m => {
+            const score = scores[m.id];
+            const dominantPole = score > 50 ? 0 : 1;
+            return m.poles[dominantPole]; // Show only the dominant pole name
+        }),
         datasets: [{
             label: 'Your Personality Profile',
-            data: metrics.map(m => scores[m.id]),
+            data: metrics.map(m => {
+                const score = scores[m.id];
+                // Calculate percentage toward dominant pole (same as in dimensions display)
+                return Math.abs(score - 50) * 2;
+            }),
             backgroundColor: 'rgba(102, 204, 153, 0.2)',
             borderColor: 'rgba(102, 204, 153, 0.8)',
             borderWidth: 2,
@@ -40,22 +48,23 @@ function createRadarChart(scores) {
                     suggestedMin: 0,
                     suggestedMax: 100,
                     ticks: {
-                        stepSize: 20,
+                        stepSize: 25,
                         backdropColor: 'transparent',
                         font: {
-                            size: 10
+                            size: 9
                         }
                     },
                     pointLabels: {
                         font: {
-                            size: 14,
+                            size: 12,
                             family: "'Quicksand', sans-serif",
                             weight: '600'
                         },
-                        padding: 20,
-                        callback: function(label) {
-                            const words = label.split(' - ');
-                            return [words[0], words[1]];
+                        padding: 15,
+                        color: context => {
+                            const index = context.index;
+                            const score = scores[metrics[index].id];
+                            return score > 50 ? metrics[index].colorPrimary : metrics[index].colorSecondary;
                         }
                     }
                 }
@@ -67,10 +76,11 @@ function createRadarChart(scores) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            const metricId = metrics[context.dataIndex].id;
-                            const score = context.raw;
-                            const pole = score > 50 ? metricId[0] : metricId[1];
-                            const poleName = metrics[context.dataIndex].poles[pole === metricId[0] ? 0 : 1];
+                            const index = context.dataIndex;
+                            const metricId = metrics[index].id;
+                            const score = scores[metricId];
+                            const dominantPole = score > 50 ? 0 : 1;
+                            const poleName = metrics[index].poles[dominantPole];
                             return `${poleName}: ${Math.abs(score - 50) * 2}%`;
                         }
                     }
@@ -87,6 +97,15 @@ function createRadarChart(scores) {
             }
         }
     };
+    
+    // Add title above chart
+    const chartContainer = document.querySelector('.chart-container');
+    if (chartContainer && !document.querySelector('.chart-title')) {
+        const title = document.createElement('div');
+        title.className = 'chart-title';
+        title.textContent = 'Your Personality Profile';
+        chartContainer.insertBefore(title, document.getElementById('results-chart'));
+    }
     
     // Create and return the chart
     return new Chart(ctx, config);

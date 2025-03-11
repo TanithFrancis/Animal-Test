@@ -1,9 +1,7 @@
 // Function to display the results
 function displayResults(scores) {
-    // Generate the animal code
+    // Get the animal code and type
     const animalCode = generateAnimalCode(scores);
-    
-    // Get the animal type
     const animalType = getAnimalType(animalCode);
     
     // Update the animal information
@@ -44,10 +42,11 @@ function displayResults(scores) {
     // Update growth areas
     document.getElementById('growth-areas').textContent = animalType.growthAreas;
     
-    // Create dimensions breakdown
+    // Clear existing dimensions breakdown
     const dimensionsBreakdown = document.getElementById('dimensions-breakdown');
     dimensionsBreakdown.innerHTML = '';
     
+    // Create dimensions breakdown
     metrics.forEach(metric => {
         const score = scores[metric.id];
         const dominantPole = score > 50 ? 0 : 1;
@@ -149,14 +148,16 @@ function displayResults(scores) {
         const scaleLabels = document.createElement('div');
         scaleLabels.className = 'scale-labels';
         
-        // Add 5 label points (0%, 25%, 50%, 75%, 100%)
-        for (let i = 0; i <= 4; i++) {
-            const label = document.createElement('div');
-            label.className = `scale-label ${i === 0 && dominantPole === 0 ? 'active' : ''} ${i === 4 && dominantPole === 1 ? 'active' : ''}`;
-            label.textContent = i === 0 ? metric.poles[0] : 
-                               i === 4 ? metric.poles[1] : '';
-            scaleLabels.appendChild(label);
-        }
+        // Add label points (0%, 50%, 100%)
+        const leftLabel = document.createElement('div');
+        leftLabel.className = `scale-label ${dominantPole === 0 ? 'active' : ''}`;
+        leftLabel.textContent = metric.poles[0];
+        scaleLabels.appendChild(leftLabel);
+        
+        const rightLabel = document.createElement('div');
+        rightLabel.className = `scale-label ${dominantPole === 1 ? 'active' : ''}`;
+        rightLabel.textContent = metric.poles[1];
+        scaleLabels.appendChild(rightLabel);
         
         // Description of the dominant trait
         const descriptionDiv = document.createElement('div');
@@ -181,14 +182,16 @@ function displayResults(scores) {
     createRadarChart(scores);
     
     // Generate QR code for sharing
-    new QRCode(document.getElementById("qr-code"), {
-        text: window.location.href,
-        width: 128,
-        height: 128,
-        colorDark: "#4A90E2",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-    });
+    if (window.QRCode) {
+        new QRCode(document.getElementById("qr-code"), {
+            text: window.location.href,
+            width: 128,
+            height: 128,
+            colorDark: "#4A90E2",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
     
     // Set up WhatsApp sharing
     document.getElementById('whatsapp-share').addEventListener('click', function() {
@@ -199,8 +202,6 @@ function displayResults(scores) {
     
     // Set up results download
     document.getElementById('download-results').addEventListener('click', function() {
-        // This is a simplified version - in a real implementation,
-        // you would use html2canvas or a similar library to create an image
         alert("This would download your results as an image in a real implementation.");
     });
 } 

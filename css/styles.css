@@ -328,6 +328,7 @@ p {
     gap: 2.5rem;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 1rem;
 }
 
 @media (min-width: 1024px) {
@@ -498,13 +499,12 @@ p {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1.5rem;
+    width: 100%;
 }
 
 .dimension-pole {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 45%;
+    text-align: center;
+    flex: 1;
 }
 
 .pole-name {
@@ -525,10 +525,11 @@ p {
 }
 
 .dimension-divider {
-    height: 70px;
+    height: 50px;
     width: 2px;
     background: #e9ecef;
     position: relative;
+    margin: 0 10px;
 }
 
 .dimension-divider:before {
@@ -585,34 +586,18 @@ p {
     display: flex;
     justify-content: space-between;
     margin-top: 0.75rem;
+    width: 100%;
 }
 
 .scale-label {
     font-size: 0.85rem;
     color: #6c757d;
     position: relative;
-    padding-top: 0.5rem;
-}
-
-.scale-label:before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1px;
-    height: 4px;
-    background: #ced4da;
 }
 
 .scale-label.active {
     font-weight: 600;
     color: #333;
-}
-
-.scale-label.active:before {
-    background: #333;
-    height: 6px;
 }
 
 /* Description Card */
@@ -917,4 +902,58 @@ p {
     #question-text {
         font-size: 16px;
     }
+}
+
+/* Additional fixes for content display */
+.results-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Fix for scale labels */
+.scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    width: 100%;
+}
+
+.scale-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    position: relative;
+}
+
+.scale-label.active {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Ensure proper dimensions and spacing for the chart */
+#results-chart {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+/* Fix for dimension-result layout */
+.dimension-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.dimension-pole {
+    text-align: center;
+    flex: 1;
+}
+
+.dimension-divider {
+    height: 50px;
+    width: 2px;
+    background: #e9ecef;
+    position: relative;
+    margin: 0 10px;
 } 
