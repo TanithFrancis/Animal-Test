@@ -1,9 +1,11 @@
-// Function to create the hexagonal radar chart
+// Mobile-optimized chart implementation
 function createRadarChart(scores) {
-    // Get the canvas element
     const ctx = document.getElementById('results-chart').getContext('2d');
     
-    // Prepare data for the chart correctly showing dominant poles
+    // Check if we're on a mobile device
+    const isMobile = window.innerWidth < 768;
+    
+    // Prepare data for the chart with mobile optimizations
     const data = {
         labels: metrics.map(m => {
             const score = scores[m.id];
@@ -14,12 +16,12 @@ function createRadarChart(scores) {
             label: 'Your Personality Profile',
             data: metrics.map(m => {
                 const score = scores[m.id];
-                // Calculate percentage toward dominant pole (same as in dimensions display)
+                // Calculate percentage toward dominant pole
                 return Math.abs(score - 50) * 2;
             }),
             backgroundColor: 'rgba(102, 204, 153, 0.2)',
             borderColor: 'rgba(102, 204, 153, 0.8)',
-            borderWidth: 2,
+            borderWidth: isMobile ? 1 : 2, // Thinner lines on mobile
             pointBackgroundColor: metrics.map(m => {
                 const score = scores[m.id];
                 return score > 50 ? m.colorPrimary : m.colorSecondary;
@@ -27,45 +29,48 @@ function createRadarChart(scores) {
             pointBorderColor: '#fff',
             pointHoverBackgroundColor: '#fff',
             pointHoverBorderColor: 'rgba(102, 204, 153, 1)',
-            pointRadius: 5,
-            pointHoverRadius: 7
+            pointRadius: isMobile ? 3 : 5, // Smaller points on mobile
+            pointHoverRadius: isMobile ? 5 : 7
         }]
     };
     
-    // Chart configuration
+    // Mobile-optimized chart configuration
     const config = {
         type: 'radar',
         data: data,
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            devicePixelRatio: 2, // For sharper rendering on high-DPI screens
             scales: {
                 r: {
-                    angleLines: {
-                        display: true,
-                        color: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    suggestedMin: 0,
-                    suggestedMax: 100,
+                    beginAtZero: true,
+                    max: 100,
                     ticks: {
-                        stepSize: 25,
-                        backdropColor: 'transparent',
+                        stepSize: 20,
+                        display: !isMobile, // Hide ticks on mobile
                         font: {
-                            size: 9
+                            size: isMobile ? 8 : 12
                         }
                     },
                     pointLabels: {
                         font: {
-                            size: 12,
-                            family: "'Quicksand', sans-serif",
-                            weight: '600'
+                            size: isMobile ? 9 : 14,
+                            weight: 'bold'
                         },
-                        padding: 15,
-                        color: context => {
-                            const index = context.index;
-                            const score = scores[metrics[index].id];
-                            return score > 50 ? metrics[index].colorPrimary : metrics[index].colorSecondary;
-                        }
+                        color: metrics.map(m => {
+                            const score = scores[m.id];
+                            return score > 50 ? m.colorPrimary : m.colorSecondary;
+                        }),
+                        padding: isMobile ? 4 : 8
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)',
+                        lineWidth: isMobile ? 0.5 : 1
+                    },
+                    angleLines: {
+                        color: 'rgba(0, 0, 0, 0.1)',
+                        lineWidth: isMobile ? 0.5 : 1
                     }
                 }
             },
@@ -74,6 +79,11 @@ function createRadarChart(scores) {
                     display: false
                 },
                 tooltip: {
+                    enabled: true,
+                    displayColors: false,
+                    bodyFont: {
+                        size: 14
+                    },
                     callbacks: {
                         label: function(context) {
                             const index = context.dataIndex;
@@ -92,7 +102,7 @@ function createRadarChart(scores) {
                 }
             },
             animation: {
-                duration: 2000,
+                duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1000,
                 easing: 'easeOutQuart'
             }
         }

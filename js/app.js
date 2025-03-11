@@ -1,159 +1,228 @@
 // Do not redefine "metrics" here – use the global variable defined in questions.js
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize variables
+    let currentScreen = 'intro-screen';
     let currentQuestionIndex = 0;
-    let userResponses = [];
-    let chart = null;
-    let shuffledQuestions = []; // Randomized questions array
-
+    const userResponses = [];
+    
     // DOM elements
-    const startBtn = document.getElementById('start-btn'); // Only present on landing if used there
-    const retakeBtn = document.getElementById('retake-btn');
+    const screens = document.querySelectorAll('.screen');
+    const startBtn = document.getElementById('start-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const backBtn = document.getElementById('back-btn');
+    const progressBar = document.getElementById('progress-bar');
     const questionText = document.getElementById('question-text');
-    const answerOptions = document.getElementById('answer-options');
-    const progressFill = document.getElementById('progress-fill'); // Optional: For progress bar updates
-    const questionCounter = document.getElementById('question-counter'); // Optional: For counter display
-    const loadingMessage = document.getElementById('loading-message'); // Optional: For loading screen
-
-    // Attach event listeners: if a start button exists, use it; otherwise, start immediately.
+    const questionNumber = document.getElementById('question-number');
+    const totalQuestions = document.getElementById('total-questions');
+    const likertOptions = document.querySelectorAll('.likert-option');
+    const retakeBtn = document.getElementById('retake-btn');
+    
+    // Set total questions
+    if (totalQuestions) {
+        totalQuestions.textContent = questions.length;
+    }
+    
+    // Initialize with intro screen
+    showScreen('intro-screen');
+    
+    // Add passive event listeners for better performance on mobile
     if (startBtn) {
-        startBtn.addEventListener('click', startAssessment);
-    } else {
-        startAssessment();
+        startBtn.addEventListener('click', startAssessment, { passive: true });
     }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', nextQuestion, { passive: true });
+    }
+    
+    if (backBtn) {
+        backBtn.addEventListener('click', previousQuestion, { passive: true });
+    }
+    
     if (retakeBtn) {
-        retakeBtn.addEventListener('click', function() {
-            if (chart) { chart.destroy(); chart = null; }
-            startAssessment();
-        });
+        retakeBtn.addEventListener('click', restartAssessment, { passive: true });
     }
-
-    // Function to start the assessment
-    function startAssessment() {
-        currentQuestionIndex = 0;
-        userResponses = [];
-        // Randomize questions (assumes `questions` is defined in questions.js)
-        shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
-        showScreen('question-screen');
-        loadQuestion();
-    }
-
-    // Function to load and display the current question
-    function loadQuestion() {
-        if (currentQuestionIndex >= shuffledQuestions.length) {
-            showLoadingScreen();
-            return;
+    
+    // Add touch events for likert options with better mobile performance
+    likertOptions.forEach(option => {
+        option.addEventListener('touchstart', function() {
+            this.classList.add('touch-active');
+        }, { passive: true });
+        
+        option.addEventListener('touchend', function() {
+            this.classList.remove('touch-active');
+            selectOption(this);
+        }, { passive: true });
+        
+        option.addEventListener('click', function() {
+            selectOption(this);
+        }, { passive: true });
+    });
+    
+    // Handle swipe gestures for question navigation
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    document.getElementById('question-screen')?.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    document.getElementById('question-screen')?.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+        const swipeThreshold = 100; // Minimum distance for swipe
+        
+        if (touchEndX < touchStartX - swipeThreshold) {
+            // Swipe left - next question
+            if (currentQuestionIndex < questions.length - 1 && isCurrentQuestionAnswered()) {
+                nextQuestion();
+            }
         }
         
-        const question = shuffledQuestions[currentQuestionIndex];
-        // Display the sequential question number and the actual question statement from questions.js
-        questionText.innerHTML = `<span class="block text-xl font-bold mb-2">
-          Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}:
-        </span> ${question.text}`;
-        answerOptions.innerHTML = ""; // Clear previous answer options
-
-        // Define elegant button styles with a slight shadow
-        const buttonDefaultClass = "bg-gray-100 text-gray-800";
-        const buttonSelectedClass = "bg-primary text-white";
-        const baseButtonClasses = "px-4 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out ";
-
-        // Likert scale labels for a 7‑point scale
-        const likertLabels = [
-            "Strongly Disagree",
-            "Disagree",
-            "Slightly Disagree",
-            "Neutral",
-            "Slightly Agree",
-            "Agree",
-            "Strongly Agree"
-        ];
-
-        const optionsContainer = document.createElement("div");
-        optionsContainer.className = "flex flex-col gap-4";
-
-        likertLabels.forEach((label, index) => {
-            const button = document.createElement("button");
-            button.className = baseButtonClasses + buttonDefaultClass + " hover:shadow-md";
-            button.textContent = label;
-            button.dataset.value = index + 1; // Scale: 1 to 7
-
-            button.addEventListener("click", function () {
-                recordResponse(question, parseInt(this.dataset.value));
-                // Clear selection styling on all buttons in the container
-                optionsContainer.querySelectorAll("button").forEach((btn) => {
-                    btn.classList.remove("bg-primary", "text-white");
-                    btn.classList.add("bg-gray-100", "text-gray-800");
-                });
-                // Apply selected styling using the green theme
-                this.classList.remove("bg-gray-100", "text-gray-800");
-                this.classList.add("bg-primary", "text-white");
-
-                // Advance to the next question after a brief delay
-                setTimeout(() => {
-                    currentQuestionIndex++;
-                    loadQuestion();
-                }, 500);
-            });
-            optionsContainer.appendChild(button);
+        if (touchEndX > touchStartX + swipeThreshold) {
+            // Swipe right - previous question
+            if (currentQuestionIndex > 0) {
+                previousQuestion();
+            }
+        }
+    }
+    
+    // Functions
+    function showScreen(screenId) {
+        screens.forEach(screen => {
+            screen.classList.remove('active');
         });
-
-        answerOptions.appendChild(optionsContainer);
-        updateProgress();
-
-        // (Optional) Ensure the question header border uses the primary (green) color
-        const questionHeader = document.querySelector(".question-header");
-        if (questionHeader) {
-            questionHeader.classList.remove("border-secondary");
-            questionHeader.classList.add("border-primary");
+        
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+            currentScreen = screenId;
+            
+            // Apply entrance animations
+            if (screenId === 'results-screen') {
+                targetScreen.classList.add('results-active');
+            }
         }
     }
-
-    // Update progress (if a progress bar or counter is used)
-    function updateProgress() {
-        if (progressFill && questionCounter && shuffledQuestions.length > 0) {
-            const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
-            progressFill.style.width = `${progress}%`;
-            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
-        }
+    
+    function startAssessment() {
+        currentQuestionIndex = 0;
+        userResponses.length = 0;
+        showScreen('question-screen');
+        displayQuestion(0);
+        updateProgressBar();
     }
-
-    // Record the user's response for the current question
-    function recordResponse(question, value) {
-        const normalizedValue = value - 1; // Convert 1–7 scale to 0–6
-        let score;
-        if (question.direction === question.metric[0]) {
-            score = (normalizedValue / 6) * 100;
+    
+    function displayQuestion(index) {
+        const question = questions[index];
+        if (!question) return;
+        
+        questionText.textContent = question.text;
+        questionNumber.textContent = index + 1;
+        
+        // Reset options
+        likertOptions.forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // Set selected option if previously answered
+        const previousResponse = userResponses.find(r => r.question === question);
+        if (previousResponse) {
+            const selectedOption = document.querySelector(`.likert-option[data-value="${previousResponse.score}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+        }
+        
+        // Update button states
+        updateButtonStates();
+    }
+    
+    function selectOption(option) {
+        // Remove selection from all options
+        likertOptions.forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        
+        // Add selection to clicked option
+        option.classList.add('selected');
+        
+        // Save response
+        const value = parseInt(option.getAttribute('data-value'));
+        const currentQuestion = questions[currentQuestionIndex];
+        
+        // Find if question was already answered
+        const existingResponseIndex = userResponses.findIndex(r => r.question === currentQuestion);
+        
+        if (existingResponseIndex !== -1) {
+            userResponses[existingResponseIndex].score = value;
         } else {
-            score = ((6 - normalizedValue) / 6) * 100;
+            userResponses.push({
+                question: currentQuestion,
+                score: value
+            });
         }
-        userResponses.push({ question, value, score });
+        
+        // Enable next button
+        updateButtonStates();
+        
+        // Auto-advance after short delay on mobile
+        if (window.innerWidth < 768 && currentQuestionIndex < questions.length - 1) {
+            setTimeout(() => {
+                nextQuestion();
+            }, 500);
+        }
     }
-
-    // Show a loading screen before calculating results
-    function showLoadingScreen() {
-        showScreen('loading-screen');
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += 5;
-            if (loadingMessage) {
-                loadingMessage.textContent = `Analyzing your responses... ${progress}%`;
-            }
-            if (progress >= 100) {
-                clearInterval(interval);
-                setTimeout(() => {
-                    calculateResults();
-                }, 500);
-            }
-        }, 100);
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion(currentQuestionIndex);
+            updateProgressBar();
+        } else {
+            calculateResults();
+        }
     }
-
-    // Calculate results and display them
+    
+    function previousQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion(currentQuestionIndex);
+            updateProgressBar();
+        }
+    }
+    
+    function updateProgressBar() {
+        const progress = ((currentQuestionIndex) / questions.length) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+    
+    function updateButtonStates() {
+        if (backBtn) {
+            backBtn.disabled = currentQuestionIndex === 0;
+        }
+        
+        if (nextBtn) {
+            const isLastQuestion = currentQuestionIndex === questions.length - 1;
+            nextBtn.textContent = isLastQuestion ? 'See Results' : 'Next';
+            nextBtn.disabled = !isCurrentQuestionAnswered();
+        }
+    }
+    
+    function isCurrentQuestionAnswered() {
+        const currentQuestion = questions[currentQuestionIndex];
+        return userResponses.some(r => r.question === currentQuestion);
+    }
+    
     function calculateResults() {
         const scores = {};
         metrics.forEach(metric => {
             scores[metric.id] = 50;
         });
-
+    
         const metricResponses = {};
         metrics.forEach(metric => {
             metricResponses[metric.id] = [];
@@ -164,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 metricResponses[response.question.metric].push(response);
             }
         });
-
+    
         metrics.forEach(metric => {
             const responses = metricResponses[metric.id];
             if (responses.length > 0) {
@@ -172,59 +241,72 @@ document.addEventListener('DOMContentLoaded', function() {
                 scores[metric.id] = Math.round(sum / responses.length);
             }
         });
-
-        // IMPORTANT: First hide all screens
-        document.querySelectorAll('.screen').forEach(screen => {
-            screen.classList.add('hidden');
-        });
+    
+        // Show results screen
+        showScreen('results-screen');
         
-        // Then show the results screen
-        const resultsScreen = document.getElementById('results-screen');
-        if (resultsScreen) {
-            resultsScreen.classList.remove('hidden');
-        }
-        
-        // Then call displayResults to generate and show the results
+        // Display results
         if (typeof displayResults === 'function') {
             displayResults(scores);
         }
     }
-
-    // Reset the assessment for "Retake Test"
-    function resetAssessment() {
-        if (chart) {
-            chart.destroy();
-            chart = null;
-        }
-        startAssessment();
+    
+    function restartAssessment() {
+        showScreen('intro-screen');
     }
-
-    // Utility function to show a specific screen by its ID (hiding others with the 'hidden' class)
-    function showScreen(screenId) {
-        const screens = document.querySelectorAll('#question-screen, #results-screen, #loading-screen');
-        screens.forEach(screen => screen.classList.add('hidden'));
-        const element = document.getElementById(screenId);
-        if (element) {
-            element.classList.remove('hidden');
+    
+    // Check for saved results in URL or localStorage
+    checkForSavedResults();
+    
+    function checkForSavedResults() {
+        // Check URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const resultsParam = urlParams.get('results');
+        
+        if (resultsParam) {
+            try {
+                const scores = JSON.parse(atob(resultsParam));
+                showScreen('results-screen');
+                if (typeof displayResults === 'function') {
+                    displayResults(scores);
+                }
+                return;
+            } catch (e) {
+                console.error('Failed to parse results from URL', e);
+            }
+        }
+        
+        // Check localStorage
+        try {
+            const savedResults = localStorage.getItem('personalityResults');
+            if (savedResults) {
+                const scores = JSON.parse(savedResults);
+                // Only auto-load if less than 24 hours old
+                const timestamp = localStorage.getItem('resultsTimestamp');
+                const isRecent = timestamp && (Date.now() - parseInt(timestamp)) < 86400000;
+                
+                if (isRecent) {
+                    showScreen('results-screen');
+                    if (typeof displayResults === 'function') {
+                        displayResults(scores);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load results from localStorage', e);
         }
     }
-
-    // Generate a dummy animal type code from metric scores.
-    function generateAnimalCode(scores) {
-        let code = "";
-        metrics.forEach(metric => {
-            const score = scores[metric.id];
-            code += (score > 50 ? metric.id[0] : metric.id[1]);
+    
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('ServiceWorker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('ServiceWorker registration failed:', error);
+                });
         });
-        return code;
-    }
-
-    // Helper: Convert a hex color to an RGB string if needed.
-    function hexToRgb(hex) {
-        hex = hex.replace('#', '');
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 16);
-        const b = parseInt(hex.substring(4, 6), 16);
-        return `${r}, ${g}, ${b}`;
     }
 }); 

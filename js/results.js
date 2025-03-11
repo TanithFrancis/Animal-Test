@@ -1,4 +1,4 @@
-// Function to display the results
+// Mobile-optimized results.js
 function displayResults(scores) {
     // Get the animal code and type
     const animalCode = generateAnimalCode(scores);
@@ -10,43 +10,19 @@ function displayResults(scores) {
     document.getElementById('animal-image').src = animalType.image;
     document.getElementById('animal-description').textContent = animalType.description;
     
-    // Update strengths
-    const strengthsList = document.getElementById('strengths-list');
-    strengthsList.innerHTML = '';
-    animalType.strengths.forEach(strength => {
-        const li = document.createElement('li');
-        li.textContent = strength;
-        strengthsList.appendChild(li);
-    });
+    // Create radar chart
+    if (typeof createRadarChart === 'function') {
+        createRadarChart(scores);
+    }
     
-    // Update challenges
-    const challengesList = document.getElementById('challenges-list');
-    challengesList.innerHTML = '';
-    animalType.challenges.forEach(challenge => {
-        const li = document.createElement('li');
-        li.textContent = challenge;
-        challengesList.appendChild(li);
-    });
-    
-    // Update compatible types
-    const compatibleTypes = document.getElementById('compatible-types');
-    compatibleTypes.innerHTML = '';
-    animalType.compatibleWith.forEach(code => {
-        const compatibleType = getAnimalType(code);
-        const div = document.createElement('div');
-        div.className = 'compatible-type';
-        div.textContent = `${compatibleType.animal} (${code})`;
-        compatibleTypes.appendChild(div);
-    });
-    
-    // Update growth areas
-    document.getElementById('growth-areas').textContent = animalType.growthAreas;
-    
-    // Clear existing dimensions breakdown
+    // Clear existing dimensions
     const dimensionsBreakdown = document.getElementById('dimensions-breakdown');
     dimensionsBreakdown.innerHTML = '';
     
-    // Updated function to create enhanced linear scales
+    // Create document fragment for better performance
+    const fragment = document.createDocumentFragment();
+    
+    // Process each metric
     metrics.forEach(metric => {
         const score = scores[metric.id];
         const dominantPole = score > 50 ? 0 : 1;
@@ -56,7 +32,7 @@ function displayResults(scores) {
         
         // Get RGB values from HEX for active color (for transparency)
         const hexToRgb = (hex) => {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(dominantColor);
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? 
                 `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : 
                 '102, 204, 153';
@@ -110,12 +86,10 @@ function displayResults(scores) {
         const scaleTicks = document.createElement('div');
         scaleTicks.className = 'scale-ticks';
         
-        // Create 11 tick marks (0%, 10%, 20%, ... 100%)
         for (let i = 0; i <= 10; i++) {
             const tick = document.createElement('div');
             tick.className = i % 5 === 0 ? 'scale-tick major' : 'scale-tick';
             
-            // Add label for major ticks
             if (i % 5 === 0) {
                 const tickLabel = document.createElement('div');
                 tickLabel.className = 'scale-tick-label';
@@ -126,13 +100,13 @@ function displayResults(scores) {
             scaleTicks.appendChild(tick);
         }
         
-        // Position marker
+        // Scale marker (position indicator)
         const scaleMarker = document.createElement('div');
         scaleMarker.className = 'scale-marker';
         scaleMarker.style.setProperty('--marker-color', dominantColor);
         scaleMarker.style.left = `${score}%`;
         
-        // Percentage pointer
+        // Scale pointer (percentage display)
         const scalePointer = document.createElement('div');
         scalePointer.className = 'scale-pointer';
         scalePointer.textContent = `${percentageTowardsDominant}%`;
@@ -227,12 +201,125 @@ function displayResults(scores) {
         dimensionDiv.appendChild(iconDiv);
         dimensionDiv.appendChild(bodyDiv);
         
-        dimensionsBreakdown.appendChild(dimensionDiv);
+        fragment.appendChild(dimensionDiv);
     });
     
-    // Create the radar chart
-    createRadarChart(scores);
+    // Append all dimensions at once for better performance
+    dimensionsBreakdown.appendChild(fragment);
     
+    // Update strengths
+    const strengthsList = document.getElementById('strengths-list');
+    strengthsList.innerHTML = '';
+    const strengthsFragment = document.createDocumentFragment();
+    animalType.strengths.forEach(strength => {
+        const li = document.createElement('li');
+        li.textContent = strength;
+        strengthsFragment.appendChild(li);
+    });
+    strengthsList.appendChild(strengthsFragment);
+    
+    // Update challenges
+    const challengesList = document.getElementById('challenges-list');
+    challengesList.innerHTML = '';
+    const challengesFragment = document.createDocumentFragment();
+    animalType.challenges.forEach(challenge => {
+        const li = document.createElement('li');
+        li.textContent = challenge;
+        challengesFragment.appendChild(li);
+    });
+    challengesList.appendChild(challengesFragment);
+    
+    // Update compatible types
+    const compatibleTypes = document.getElementById('compatible-types');
+    compatibleTypes.innerHTML = '';
+    const compatibleFragment = document.createDocumentFragment();
+    animalType.compatibleWith.forEach(code => {
+        const compatibleType = getAnimalType(code);
+        const div = document.createElement('div');
+        div.className = 'compatible-type';
+        div.textContent = `${compatibleType.animal} (${code})`;
+        compatibleFragment.appendChild(div);
+    });
+    compatibleTypes.appendChild(compatibleFragment);
+    
+    // Update growth areas
+    document.getElementById('growth-areas').textContent = animalType.growthAreas;
+    
+    // Set up sharing features
+    setupShareFeatures(scores);
+    
+    // Set up touch interactions for mobile
+    setupTouchInteractions();
+    
+    // Save results to localStorage for future visits
+    try {
+        localStorage.setItem('personalityResults', JSON.stringify(scores));
+        localStorage.setItem('resultsTimestamp', Date.now().toString());
+    } catch (e) {
+        console.warn('Could not save results to localStorage', e);
+    }
+}
+
+// Generate animal code based on scores
+function generateAnimalCode(scores) {
+    let code = '';
+    
+    // E/I dimension
+    code += scores.EI > 50 ? 'E' : 'I';
+    
+    // N/S dimension
+    code += scores.NS > 50 ? 'N' : 'S';
+    
+    // T/F dimension
+    code += scores.TF > 50 ? 'T' : 'F';
+    
+    // J/P dimension
+    code += scores.JP > 50 ? 'J' : 'P';
+    
+    // A/T dimension
+    code += scores.AT > 50 ? 'A' : 'T';
+    
+    // P/I dimension
+    code += scores.PI > 50 ? 'P' : 'I';
+    
+    return code;
+}
+
+// Setup mobile-specific touch interactions
+function setupTouchInteractions() {
+    // Only run on touch devices
+    if ('ontouchstart' in window) {
+        // Use passive listeners for better scroll performance
+        document.querySelectorAll('.dimension').forEach(dim => {
+            dim.addEventListener('touchstart', () => {
+                dim.classList.add('touched');
+            }, { passive: true });
+            
+            dim.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    dim.classList.remove('touched');
+                }, 200);
+            }, { passive: true });
+        });
+        
+        // Optimize mobile sharing
+        document.getElementById('whatsapp-share').addEventListener('touchend', function(e) {
+            const text = generateShareText();
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(whatsappUrl);
+        }, { passive: true });
+    }
+}
+
+// Helper function for share text
+function generateShareText() {
+    const animalName = document.getElementById('animal-name').textContent;
+    const animalCode = document.getElementById('animal-code').textContent;
+    return `I'm a ${animalName} on the Animal Personality Assessment! My type is ${animalCode}. Take the test: ${window.location.href}`;
+}
+
+// Setup share features
+function setupShareFeatures(scores) {
     // Generate QR code for sharing
     if (window.QRCode) {
         new QRCode(document.getElementById("qr-code"), {
@@ -245,15 +332,44 @@ function displayResults(scores) {
         });
     }
     
-    // Set up WhatsApp sharing
+    // Set up WhatsApp sharing with optimized handler
     document.getElementById('whatsapp-share').addEventListener('click', function() {
-        const text = `I'm a ${animalType.animal} on the Animal Personality Assessment! My type is ${animalCode}. Take the test: ${window.location.href}`;
+        const text = generateShareText();
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
         window.open(whatsappUrl);
     });
     
-    // Set up results download
+    // Set up download with deferred execution
     document.getElementById('download-results').addEventListener('click', function() {
+        // Implementing a real download capability would go here
         alert("This would download your results as an image in a real implementation.");
     });
+}
+
+// Get animal type from code
+function getAnimalType(code) {
+    // This would be replaced with your actual animal type definitions
+    const animalTypes = {
+        'INTJTI': {
+            animal: 'Fox',
+            image: 'images/animals/fox.png',
+            description: 'Cunning and adaptive—you unravel challenges with strategic savvy.',
+            strengths: ['Cunning', 'Adaptive', 'Resourceful'],
+            challenges: ['Mischievous', 'Distrustful'],
+            compatibleWith: ['INTPTP', 'ISTPTI', 'ESFPAP'],
+            growthAreas: 'Build trust to balance your independent streak.'
+        },
+        // Add other animal types here
+    };
+    
+    // Return the animal type or a default if not found
+    return animalTypes[code] || {
+        animal: 'Mystery Animal',
+        image: 'images/animals/default.png',
+        description: 'A unique combination of traits makes you special!',
+        strengths: ['Adaptability', 'Uniqueness'],
+        challenges: ['Being understood'],
+        compatibleWith: [],
+        growthAreas: 'Explore how your unique combination of traits works together.'
+    };
 } 
