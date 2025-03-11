@@ -325,7 +325,9 @@ p {
 .results-container {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 2.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 @media (min-width: 1024px) {
@@ -381,34 +383,62 @@ p {
 .chart-container {
     background: white;
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    padding: 2rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    padding: 1.5rem;
     width: 100%;
-    max-width: 600px;
+    max-width: 400px;
     margin: 0 auto;
     aspect-ratio: 1/1;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Dimensions Breakdown */
+.chart-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+}
+
+.chart-title {
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+/* Completely Redesigned Dimensions Section */
 .results-breakdown {
     grid-column: 1 / -1;
     background: white;
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    padding: 2rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    padding: 2.5rem;
 }
 
 .results-breakdown h3 {
-    font-size: 1.5rem;
-    color: var(--primary-color, #66CC99);
-    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 2rem;
     text-align: center;
+    position: relative;
+}
+
+.results-breakdown h3:after {
+    content: "";
+    position: absolute;
+    bottom: -0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: var(--primary-color, #66CC99);
+    border-radius: 2px;
 }
 
 #dimensions-breakdown {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 2rem;
 }
 
 @media (min-width: 768px) {
@@ -417,116 +447,212 @@ p {
     }
 }
 
+@media (min-width: 1200px) {
+    #dimensions-breakdown {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Premium Dimension Card Design */
 .dimension {
     background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
 }
 
 .dimension:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
 
 .dimension-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .dimension-title {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #333;
-}
-
-.dimension-score {
     font-weight: 700;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    color: white;
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: block;
 }
 
-/* Scale Container */
-.scale-container {
+.dimension-subtitle {
+    font-size: 0.9rem;
+    color: #6c757d;
+    display: block;
+}
+
+/* Elegant Scale Design */
+.dimension-body {
+    padding: 1.5rem;
+}
+
+.dimension-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.dimension-pole {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 45%;
+}
+
+.pole-name {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.pole-percentage {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.pole-inactive {
+    opacity: 0.4;
+}
+
+.dimension-divider {
+    height: 70px;
+    width: 2px;
+    background: #e9ecef;
     position: relative;
-    height: 40px;
-    margin: 1.5rem 0;
 }
 
-.scale-track {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 8px;
-    background: linear-gradient(to right, 
-        var(--left-color, #3366CC) 0%, 
-        var(--left-color, #3366CC) 50%, 
-        var(--right-color, #FF9933) 50%, 
-        var(--right-color, #FF9933) 100%);
-    border-radius: 4px;
-    transform: translateY(-50%);
-}
-
-.scale-marker {
+.dimension-divider:before {
+    content: "vs";
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 20px;
-    height: 20px;
-    background: white;
-    border: 3px solid var(--marker-color, #66CC99);
-    border-radius: 50%;
     transform: translate(-50%, -50%);
-    transition: left 1.5s cubic-bezier(0.19, 1, 0.22, 1);
-    z-index: 2;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    background: white;
+    padding: 0.25rem;
+    font-size: 0.8rem;
+    color: #adb5bd;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Advanced Scale Visualization */
+.scale-container {
+    position: relative;
+    height: 12px;
+    margin: 1.5rem 0;
+    background: #f1f3f5;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.scale-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--left-color), var(--right-color));
+    border-radius: 6px;
+    transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+    position: relative;
+}
+
+.scale-fill:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background: var(--right-color);
+    border-radius: 50%;
+    transform: scale(1.2);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 .scale-labels {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 .scale-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    color: #6c757d;
+    position: relative;
+    padding-top: 0.5rem;
+}
+
+.scale-label:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 4px;
+    background: #ced4da;
 }
 
 .scale-label.active {
-    background-color: rgba(0,0,0,0.05);
-    transform: scale(1.05);
+    font-weight: 600;
+    color: #333;
 }
 
-.scale-percentage {
-    position: absolute;
-    top: -25px;
-    transform: translateX(-50%);
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--marker-color, #66CC99);
-    background: white;
-    padding: 0.15rem 0.5rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: left 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+.scale-label.active:before {
+    background: #333;
+    height: 6px;
 }
 
+/* Description Card */
 .dimension-description {
+    background: #f8f9fa;
+    padding: 1.25rem;
+    border-radius: 12px;
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.6;
     color: #495057;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #f0f0f0;
+    margin-top: 1.5rem;
+    position: relative;
+    border-left: 4px solid var(--dominant-color, #66CC99);
+}
+
+.dimension-description:before {
+    content: "";
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    font-size: 2.5rem;
+    line-height: 1;
+    color: rgba(0,0,0,0.1);
+    font-family: serif;
+}
+
+/* Dimension Icon */
+.dimension-icon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    color: var(--dominant-color, #66CC99);
 }
 
 /* Animal Description */

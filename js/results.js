@@ -54,11 +54,13 @@ function displayResults(scores) {
         const dominantColor = dominantPole === 0 ? metric.colorPrimary : metric.colorSecondary;
         const oppositeColor = dominantPole === 0 ? metric.colorSecondary : metric.colorPrimary;
         const percentageTowardsDominant = Math.abs(score - 50) * 2;
+        const percentageTowardsOpposite = 100 - percentageTowardsDominant;
         
+        // Create dimension card
         const dimensionDiv = document.createElement('div');
         dimensionDiv.className = 'dimension';
         
-        // Header with title and score
+        // Header section
         const headerDiv = document.createElement('div');
         headerDiv.className = 'dimension-header';
         
@@ -66,69 +68,111 @@ function displayResults(scores) {
         titleSpan.className = 'dimension-title';
         titleSpan.textContent = metric.name;
         
-        const scoreSpan = document.createElement('span');
-        scoreSpan.className = 'dimension-score';
-        scoreSpan.textContent = `${percentageTowardsDominant}%`;
-        scoreSpan.style.backgroundColor = dominantColor;
+        const subtitleSpan = document.createElement('span');
+        subtitleSpan.className = 'dimension-subtitle';
+        subtitleSpan.textContent = metric.description;
         
         headerDiv.appendChild(titleSpan);
-        headerDiv.appendChild(scoreSpan);
+        headerDiv.appendChild(subtitleSpan);
         
-        // Create the visual scale
+        // Icon for dimension
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'dimension-icon';
+        iconDiv.style.setProperty('--dominant-color', dominantColor);
+        
+        // Use first letter of metric ID as icon
+        iconDiv.textContent = metric.id[0];
+        
+        // Body section
+        const bodyDiv = document.createElement('div');
+        bodyDiv.className = 'dimension-body';
+        
+        // Result display with percentages
+        const resultDiv = document.createElement('div');
+        resultDiv.className = 'dimension-result';
+        
+        // Left pole
+        const leftPoleDiv = document.createElement('div');
+        leftPoleDiv.className = `dimension-pole ${dominantPole === 0 ? '' : 'pole-inactive'}`;
+        
+        const leftPoleName = document.createElement('div');
+        leftPoleName.className = 'pole-name';
+        leftPoleName.textContent = metric.poles[0];
+        leftPoleName.style.color = metric.colorPrimary;
+        
+        const leftPolePercentage = document.createElement('div');
+        leftPolePercentage.className = 'pole-percentage';
+        leftPolePercentage.textContent = `${dominantPole === 0 ? percentageTowardsDominant : percentageTowardsOpposite}%`;
+        leftPolePercentage.style.color = metric.colorPrimary;
+        
+        leftPoleDiv.appendChild(leftPoleName);
+        leftPoleDiv.appendChild(leftPolePercentage);
+        
+        // Divider
+        const dividerDiv = document.createElement('div');
+        dividerDiv.className = 'dimension-divider';
+        
+        // Right pole
+        const rightPoleDiv = document.createElement('div');
+        rightPoleDiv.className = `dimension-pole ${dominantPole === 1 ? '' : 'pole-inactive'}`;
+        
+        const rightPoleName = document.createElement('div');
+        rightPoleName.className = 'pole-name';
+        rightPoleName.textContent = metric.poles[1];
+        rightPoleName.style.color = metric.colorSecondary;
+        
+        const rightPolePercentage = document.createElement('div');
+        rightPolePercentage.className = 'pole-percentage';
+        rightPolePercentage.textContent = `${dominantPole === 1 ? percentageTowardsDominant : percentageTowardsOpposite}%`;
+        rightPolePercentage.style.color = metric.colorSecondary;
+        
+        rightPoleDiv.appendChild(rightPoleName);
+        rightPoleDiv.appendChild(rightPolePercentage);
+        
+        resultDiv.appendChild(leftPoleDiv);
+        resultDiv.appendChild(dividerDiv);
+        resultDiv.appendChild(rightPoleDiv);
+        
+        // Scale visualization
         const scaleContainer = document.createElement('div');
         scaleContainer.className = 'scale-container';
         
-        // Scale track with gradient
-        const scaleTrack = document.createElement('div');
-        scaleTrack.className = 'scale-track';
-        scaleTrack.style.setProperty('--left-color', metric.colorPrimary);
-        scaleTrack.style.setProperty('--right-color', metric.colorSecondary);
+        const scaleFill = document.createElement('div');
+        scaleFill.className = 'scale-fill';
+        scaleFill.style.width = `${score}%`;
+        scaleFill.style.setProperty('--left-color', metric.colorPrimary);
+        scaleFill.style.setProperty('--right-color', metric.colorSecondary);
         
-        // Marker that shows position
-        const scaleMarker = document.createElement('div');
-        scaleMarker.className = 'scale-marker';
-        scaleMarker.style.setProperty('--marker-color', dominantColor);
-        scaleMarker.style.left = `${score}%`;
+        scaleContainer.appendChild(scaleFill);
         
-        // Percentage indicator
-        const scalePercentage = document.createElement('div');
-        scalePercentage.className = 'scale-percentage';
-        scalePercentage.textContent = `${percentageTowardsDominant}%`;
-        scalePercentage.style.setProperty('--marker-color', dominantColor);
-        scalePercentage.style.left = `${score}%`;
-        
-        // Labels for both poles
+        // Scale labels
         const scaleLabels = document.createElement('div');
         scaleLabels.className = 'scale-labels';
         
-        const leftLabel = document.createElement('div');
-        leftLabel.className = `scale-label ${dominantPole === 0 ? 'active' : ''}`;
-        leftLabel.textContent = metric.poles[0];
-        leftLabel.style.color = metric.colorPrimary;
-        
-        const rightLabel = document.createElement('div');
-        rightLabel.className = `scale-label ${dominantPole === 1 ? 'active' : ''}`;
-        rightLabel.textContent = metric.poles[1];
-        rightLabel.style.color = metric.colorSecondary;
-        
-        scaleLabels.appendChild(leftLabel);
-        scaleLabels.appendChild(rightLabel);
-        
-        // Add all elements to the scale container
-        scaleContainer.appendChild(scaleTrack);
-        scaleContainer.appendChild(scaleMarker);
-        scaleContainer.appendChild(scalePercentage);
+        // Add 5 label points (0%, 25%, 50%, 75%, 100%)
+        for (let i = 0; i <= 4; i++) {
+            const label = document.createElement('div');
+            label.className = `scale-label ${i === 0 && dominantPole === 0 ? 'active' : ''} ${i === 4 && dominantPole === 1 ? 'active' : ''}`;
+            label.textContent = i === 0 ? metric.poles[0] : 
+                               i === 4 ? metric.poles[1] : '';
+            scaleLabels.appendChild(label);
+        }
         
         // Description of the dominant trait
         const descriptionDiv = document.createElement('div');
         descriptionDiv.className = 'dimension-description';
+        descriptionDiv.style.setProperty('--dominant-color', dominantColor);
         descriptionDiv.textContent = metric.poleDescriptions[metric.id[dominantPole]];
         
-        // Assemble the complete dimension display
+        // Assemble all elements
+        bodyDiv.appendChild(resultDiv);
+        bodyDiv.appendChild(scaleContainer);
+        bodyDiv.appendChild(scaleLabels);
+        bodyDiv.appendChild(descriptionDiv);
+        
         dimensionDiv.appendChild(headerDiv);
-        dimensionDiv.appendChild(scaleContainer);
-        dimensionDiv.appendChild(scaleLabels);
-        dimensionDiv.appendChild(descriptionDiv);
+        dimensionDiv.appendChild(iconDiv);
+        dimensionDiv.appendChild(bodyDiv);
         
         dimensionsBreakdown.appendChild(dimensionDiv);
     });
